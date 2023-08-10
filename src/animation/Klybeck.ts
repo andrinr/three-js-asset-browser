@@ -63,7 +63,7 @@ export class Klybeck extends ThreeAnimation {
     }
 
     public init(): void {
-        this.scale = 0.002;
+        this.scale = 1;
 
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = VSMShadowMap; // 
@@ -73,16 +73,18 @@ export class Klybeck extends ThreeAnimation {
         this.renderer.toneMapping = ACESFilmicToneMapping;
         this.renderer.toneMappingExposure = 0.40;
         
-        //this.scene.fog = new Fog(0xb4c1c2, 20 * this.scale , 45 * this.scale );
-        //this.controls.enableDamping = false;
-        this.controls.enablePan = true;
+        this.scene.fog = new Fog(0xb4c1c2, 10 * this.scale , 20 * this.scale );
+        this.controls.enableDamping = true;
+        this.controls.enablePan = false;
         this.controls.enableZoom = true;
         this.controls.enableRotate = true;
-        this.controls.screenSpacePanning = true;
+        this.controls.screenSpacePanning = false;
         this.controls.panSpeed = 0.5;
+        // auto rotation
+        this.controls.autoRotate = true;
+        this.controls.autoRotateSpeed = 0.1;
 
-        this.camera.position.set(0, 0, 10);
-        this.camera.projectionMatrix 
+        this.camera.position.set(0, -10, 5);
         //this.controls.maxDistance = 30 * this.scale ;
         //this.controls.minDistance = 3 * this.scale ;
     
@@ -99,13 +101,13 @@ export class Klybeck extends ThreeAnimation {
             this.gui.add(this.camera.position, 'z', -10, 10).step(0.1);
         }
         this.sunPosition = new Vector3(0, 0, 0);
-        const phi : number = MathUtils.degToRad( 90 - 30 );
-        const theta : number = MathUtils.degToRad( 80 );
+        const phi : number = MathUtils.degToRad( 90 - 20 );
+        const theta : number = MathUtils.degToRad( 50 );
         this.sunPosition.setFromSphericalCoords( 1, phi, theta );
         this.sunPosition.multiplyScalar( this.scale );
 
         this.addLights();
-        //this.addSky();
+        this.addSky();
         this.addModels(); 
     }
 
@@ -151,19 +153,19 @@ export class Klybeck extends ThreeAnimation {
 
 	private addLights() {
 		const light = new DirectionalLight( "#ffd1d1", 3.5 );
-	    light.position.multiplyScalar(0).add(this.sunPosition.clone().multiplyScalar(200));
+	    light.position.multiplyScalar(0).add(this.sunPosition.clone().multiplyScalar(this.scale * 10));
 
 		light.castShadow = true;
 
 		light.shadow.mapSize.width = 2048; 
 		light.shadow.mapSize.height = 2048;
 		light.shadow.camera.near = 0.1;
-		light.shadow.camera.far = 3;
+		light.shadow.camera.far = 100 * this.scale;
 		light.shadow.bias = -0.00001;
         light.shadow.radius = 0.7;
 
-        //const helper = new DirectionalLightHelper( light, 5 );
-        //this.scene.add( helper );
+        const helper = new DirectionalLightHelper( light, 5 );
+        this.scene.add( helper );
 
 		const ambientLight = new AmbientLight( "0xa68195");
         ambientLight.intensity = 0.3;
@@ -189,12 +191,16 @@ export class Klybeck extends ThreeAnimation {
 	private async addModels() {
 
         const plane = new PlaneGeometry(2000, 2000, 8, 8);
-        const planeMesh = new Mesh(plane, new MeshBasicMaterial({color: 0xf00000}));
+        const planeMesh = new Mesh(plane, new MeshPhongMaterial({color: 0xffffff}));
+        planeMesh.receiveShadow = true;
         this.scene.add(planeMesh);
   
 
         const box = new BoxGeometry (1, 1, 1);
-        const boxMesh = new Mesh(box, new MeshBasicMaterial({color: 0x00ff00}));
+        box.translate(0, 0, 1);
+        const boxMesh = new Mesh(box, new MeshPhongMaterial({color: 0xffffff}));
+        boxMesh.castShadow = true;
+        boxMesh.receiveShadow = true;
         boxMesh.position.set(0, 0, 0);
         this.scene.add(boxMesh);
 
