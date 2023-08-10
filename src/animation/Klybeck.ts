@@ -74,21 +74,20 @@ export class Klybeck extends ThreeAnimation {
         this.renderer.toneMappingExposure = 0.40;
         
         //this.scene.fog = new Fog(0xb4c1c2, 20 * this.scale , 45 * this.scale );
-        this.controls.touches.ONE = TOUCH.PAN;
-
         //this.controls.enableDamping = false;
         this.controls.enablePan = true;
         this.controls.enableZoom = true;
         this.controls.enableRotate = true;
-        this.controls.screenSpacePanning = false;
+        this.controls.screenSpacePanning = true;
         this.controls.panSpeed = 0.5;
 
         this.camera.position.set(0, 0, 10);
+        this.camera.projectionMatrix 
         //this.controls.maxDistance = 30 * this.scale ;
         //this.controls.minDistance = 3 * this.scale ;
     
         this.controls.mouseButtons = {
-            LEFT: MOUSE.PAN,
+            LEFT: MOUSE.ROTATE,
             MIDDLE: MOUSE.DOLLY,
             RIGHT: MOUSE.PAN
         }
