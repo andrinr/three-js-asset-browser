@@ -1,10 +1,8 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { watchResize } from "svelte-watch-resize";
-  import { VillageAnimation } from "./animation/villageAnimation";
+  import { Klybeck } from "./animation/Klybeck";
   import Tile from "./components/Tile.svelte";
-  import Button from "./components/Button.svelte";
-  import Notification from "./components/Notification.svelte";
   import Loader from "./components/Loader.svelte";
 
   // @ts-ignore
@@ -16,31 +14,12 @@
     contentId = id;
   };
 
-  let villageAnimation: VillageAnimation;
+  let animation: Klybeck;
 
   const resize = (element: HTMLElement) => {
-    if (villageAnimation) {
-      villageAnimation.resize(element);
+    if (animation) {
+      animation.resize(element);
     }
-  };
-  const getAndSetCamera = () => {
-    villageAnimation.animateCamera(contentId, 2000);
-  };
-
-  const increementContentId = () => {
-    contentId = (contentId + 1) % data.content.length;
-    getAndSetCamera();
-  };
-
-  const decreementContentId = () => {
-    // Make sure there are no negative numbers
-    contentId = (contentId - 1 + data.content.length) % data.content.length;
-    getAndSetCamera();
-  };
-
-  const backtoMain = () => {
-    contentId = 0;
-    getAndSetCamera();
   };
 
   const loadedScene = () => {
@@ -48,24 +27,13 @@
     document.getElementById("loading-screen").style.display = "none";
   };
 
-  function onKeyDown(e) {
-    switch (e.keyCode) {
-      case 39:
-        increementContentId();
-        break;
-      case 37:
-        decreementContentId();
-        break;
-    }
-  }
-
   onMount(async () => {
     const canvas: HTMLCanvasElement = document.getElementById(
       "three"
     ) as HTMLCanvasElement;
     const wrapper: HTMLElement = document.getElementById("wrapper");
     buttons = document.getElementById("buttons");
-    villageAnimation = new VillageAnimation(canvas, wrapper, contentIDCallback, loadedScene);
+    animation = new Klybeck(canvas, wrapper, contentIDCallback, loadedScene);
   });
 </script>
 
@@ -86,36 +54,13 @@
           learnMoreTitle={data.content[contentId].learnMoreTitle}
           learnMoreContent={data.content[contentId].learnMoreContent}
         >
-          <!--<div class='minimize-button'>
-            <Button iconSource="icons/minus.svg" callback={backtoMain} />
-          </div>-->
-
-          <div class="buttons">
-            <div class="button">
-              <Button iconSource="icons/home-line.svg" callback={backtoMain} />
-            </div>
-
-            <div class="button">
-              <Button
-                iconSource="icons/arrow-left-s-line.svg"
-                callback={decreementContentId}
-              />
-            </div>
-
-            <div class="button">
-              <Button
-                iconSource="icons/arrow-right-s-line.svg"
-                callback={increementContentId}
-              />
-            </div>
-          </div>
         </Tile>
       </div>
     </div>
   </div>
 </main>
 
-<svelte:window on:keydown={onKeyDown} />
+<svelte:window/>
 
 <style>
   .wrapper {
@@ -135,10 +80,6 @@
     height: 100%;
     top: 0;
     left: 0;
-  }
-
-  .hidden {
-    display: none;
   }
 
   .wrapper-content {
@@ -172,27 +113,7 @@
     margin-left: 60px;
     z-index: 100;
   }
-  .buttons {
-    position: absolute;
-    bottom: 0;
-    display: flex;
-    justify-content: flex-start;
-    padding-top: 30px;
-    margin-bottom: 10px;
-  }
 
-  .button {
-    position: relative;
-    margin-right: 10px;
-    z-index: 100;
-  }
-
-  .minimize-button {
-    position: absolute;
-    top: 0;
-    right: 0;
-    z-index: 100;
-  }
 
   @media (orientation: portrait) {
     .wrapper-content {
@@ -208,8 +129,5 @@
       z-index: 100;
     }
 
-    .buttons {
-      padding-top: 10px;
-    }
   }
 </style>

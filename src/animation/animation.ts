@@ -71,7 +71,7 @@ export abstract class ThreeAnimation {
         );
         this.scene = new Scene();
       
-        this.camera = new PerspectiveCamera( 20, this.wrapper.clientWidth / this.wrapper.clientHeight, 0.001, 1000 );
+        this.camera = new PerspectiveCamera( 45, this.wrapper.clientWidth / this.wrapper.clientHeight, 0.001, 1000 );
         this.controls = new OrbitControls( this.camera, this.renderer.domElement );
         this.init();
         this.startTime = Date.now();
