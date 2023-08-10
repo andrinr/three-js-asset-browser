@@ -41,7 +41,7 @@ interface Map<T> {
     }
 }
 
-export class Klybeck extends ThreeAnimation {
+export class Assets extends ThreeAnimation {
 	scene: Scene;
     private scale : number;
     private sunPosition : Vector3;
@@ -55,10 +55,9 @@ export class Klybeck extends ThreeAnimation {
     public constructor(
         canvas: HTMLCanvasElement, 
         wrapper: HTMLElement, 
-        contentIDCallback : (id : number) => void,
         loadedCallback : () => void
         ) {
-        super(canvas, wrapper);
+        super(canvas, wrapper, true);
         this.loadedCallback = loadedCallback;
     }
 

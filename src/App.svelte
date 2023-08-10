@@ -1,12 +1,14 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { watchResize } from "svelte-watch-resize";
-  import { Klybeck } from "./animation/Klybeck";
+  //import { Klybeck } from "./animation/klybeck";
+  import { Assets } from "./animation/assets";
   import Tile from "./components/Tile.svelte";
   import Loader from "./components/Loader.svelte";
 
   // @ts-ignore
   import * as data from "./content.json";
+
   let contentId = 0;
   let buttons: HTMLElement;
 
@@ -14,12 +16,15 @@
     contentId = id;
   };
 
-  let animation: Klybeck;
+  //let animation: Klybeck;
+  let assets : Assets;
 
   const resize = (element: HTMLElement) => {
-    if (animation) {
-      animation.resize(element);
+    if (assets) {
+      assets.resize(element);
     }
+
+    
   };
 
   const loadedScene = () => {
@@ -33,7 +38,8 @@
     ) as HTMLCanvasElement;
     const wrapper: HTMLElement = document.getElementById("wrapper");
     buttons = document.getElementById("buttons");
-    animation = new Klybeck(canvas, wrapper, contentIDCallback, loadedScene);
+    //animation = new Klybeck(canvas, wrapper, contentIDCallback, loadedScene);
+    assets = new Assets(canvas, wrapper, loadedScene);
   });
 </script>
 
