@@ -3,54 +3,41 @@ import {
     sRGBEncoding, 
     ACESFilmicToneMapping, 
     Scene, 
-    Fog, 
     Vector3,
     DirectionalLight, 
     AmbientLight,
+    Raycaster,
     MathUtils,
     VSMShadowMap,
-    PCFShadowMap,
     Mesh,
-    Color,
-    MOUSE,
     HemisphereLight,
-    Raycaster,
     Vector2,
-    Object3D,
-    TOUCH,
-    ShaderMaterial,
     DirectionalLightHelper,
-    Plane,
-    MeshPhongMaterial,
-    PlaneBufferGeometry,
+    OrthographicCamera,
     MeshBasicMaterial,
-    PlaneGeometry,
-    BoxGeometry} from 'three';
+    BoxGeometry,
+    MeshPhongMaterial} from 'three';
 
-import { Sky } from 'three/examples/jsm/objects/Sky.js';
+
 // Local imports
 import { loadGLTF } from './loader';
 import { ThreeAnimation } from "./animation";
-import { generateGradientMaterial } from './gradientMaterial';
 import * as dat from 'lil-gui'
-
-interface Map<T> {
-    [key: number]: {
-        name: string,
-        data: T
-    }
-}
 
 export class Assets extends ThreeAnimation {
 	scene: Scene;
     private scale : number;
     private sunPosition : Vector3;
-    private displayGui : boolean = true;
-    private floor : Mesh;
+    private displayGui : boolean;
 
-    private mouseHasMoved : boolean = false;
+    private mouseHasMoved : boolean;
     private loadedCallback : () => void;
     private gui : dat.GUI;
+
+    private selectables : Mesh[];
+    private mesh : Mesh;
+
+    private raycaster : Raycaster;
 
     public constructor(
         canvas: HTMLCanvasElement, 
@@ -59,10 +46,16 @@ export class Assets extends ThreeAnimation {
         ) {
         super(canvas, wrapper, true, false);
         this.loadedCallback = loadedCallback;
+        this.displayGui = true;
+        this.mouseHasMoved = false;
+
     }
 
     public init(): void {
         this.scale = 1;
+
+        this.selectables = [];
+        this.raycaster = new Raycaster();
 
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = VSMShadowMap; // 
@@ -74,13 +67,18 @@ export class Assets extends ThreeAnimation {
         
         //this.camera.position.set(1, 1, 1);
 
-        if (this.displayGui) this.gui = new dat.GUI();
+        this.gui = new dat.GUI();
 
-        if (this.displayGui){
-            this.gui.add(this.camera.position, 'x', -10, 10).step(0.1);
-            this.gui.add(this.camera.position, 'y', -10, 10).step(0.1);
-            this.gui.add(this.camera.position, 'z', -10, 10).step(0.1);
-        }
+        this.camera.position.set(0, 0, 10);
+        this.camera.zoom = 100;
+
+        this.gui.add(this.camera.position, 'x', -100, 100).step(0.1);
+        this.gui.add(this.camera.position, 'y', -100, 100).step(0.1);
+        this.gui.add(this.camera.position, 'z', -100, 100).step(0.1);
+
+        this.gui.add((this.camera as OrthographicCamera), 'near', 0, 100).step(0.1);
+        this.gui.add((this.camera as OrthographicCamera), 'far', 0, 100).step(0.1);
+        
         this.sunPosition = new Vector3(0, 0, 0);
         const phi : number = MathUtils.degToRad( 90 - 20 );
         const theta : number = MathUtils.degToRad( 50 );
@@ -92,83 +90,62 @@ export class Assets extends ThreeAnimation {
     }
 
     public update(delta: number): void {
-        
-        console.log(this.camera.position);
+        for (let i = 0; i < this.selectables.length; i++) {
+            const element = this.selectables[i];
+            //element.rotation.x += 0.01;
+            element.rotation.y += 0.001;
+        }
+
+        this.raycaster.setFromCamera( this.mousePosition, this.camera );
+
+        const intersects = this.raycaster.intersectObjects( this.selectables );
+
+        //console.log(this.mousePosition);
+        if (intersects.length > 0) {
+            const intersect = intersects[0];
+            const object = intersect.object;
+            object.material.color.set(0xff0000);
+        }
     }
     
-    public onMouseMove(event: MouseEvent): void {
-        this.mouseHasMoved = true;
-        const mouse = new Vector2();
-        mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-        mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-    }
+    public onScroll(event: WheelEvent): void {
+        event.preventDefault();
+        event.stopPropagation();
 
-    public onMouseUp(event: MouseEvent): void {
-        if(this.mouseHasMoved || !this.mouseOnScreen)
-            return;
-    
-        const mouse = new Vector2();
-        mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-        mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-
-    }
-
-    public onMouseDown(event: MouseEvent): void {
-        this.mouseHasMoved = false;
+        const delta = event.deltaY;
+        this.camera.position.y += delta * 0.01;
     }
 
 
 	private addLights() {
-		const light = new DirectionalLight( "#ffd1d1", 3.5 );
-	    light.position.multiplyScalar(0).add(this.sunPosition.clone().multiplyScalar(this.scale * 10));
+        const hemiLight = new HemisphereLight( 0xb0d4ff, 0xfcb928, 1.0 );
+        hemiLight.position.set( 0, 50, 0 );
+        this.scene.add( hemiLight );
 
-		light.castShadow = true;
-
-		light.shadow.mapSize.width = 2048; 
-		light.shadow.mapSize.height = 2048;
-		light.shadow.camera.near = 0.1;
-		light.shadow.camera.far = 100 * this.scale;
-		light.shadow.bias = -0.00001;
-        light.shadow.radius = 0.7;
-
-        const helper = new DirectionalLightHelper( light, 5 );
-        this.scene.add( helper );
-
-		const ambientLight = new AmbientLight( "0xa68195");
-        ambientLight.intensity = 0.3;
-        
-        const hemiLight = new HemisphereLight( "#4dc1ff", "#ffdca8", 0.4);
-
-        if (this.gui) {
-            
-            this.gui.add(light, 'intensity', 0,10,0.01).name("Sun Light");
-            this.gui.add(ambientLight, 'intensity', 0,5,0.01).name("Ambient Light");
-            this.gui.add(hemiLight, 'intensity', 0,5,0.01).name("Hemi Light");
-
-            this.gui.addColor(light, 'color').name("Sun Color");
-            this.gui.addColor(ambientLight, 'color').name("Ambient Color");
-            this.gui.addColor(hemiLight, 'color').name("Hemi Color Sky");
-            this.gui.addColor(hemiLight, 'groundColor').name("Hemi Color Ground");
-        }
-        this.scene.add(hemiLight);
-        this.scene.add(light);
-        this.scene.add(light);
-		this.scene.add(ambientLight);
 	}
 
 	private async addModels() {
 
-        const box = new BoxGeometry (1, 1, 1);
-        box.translate(0, 0, 1);
-        //const boxMesh = new Mesh(box, new MeshPhongMaterial({color: 0xffffff}));
-        const boxMesh = new Mesh(box, new MeshBasicMaterial({color: 0xffffff}));
-        boxMesh.castShadow = true;
-        boxMesh.receiveShadow = true;
-        boxMesh.position.set(0, 0, 0);
-        this.scene.add(boxMesh);
+        const gridX = 3;
 
+        for (let i = 0; i < 40; i++) {
+            const geometry = new BoxGeometry( 1, 1, 1 );
+            const material = new MeshPhongMaterial( { color: 0xffffff } );
+            const cube = new Mesh( geometry, material );
+
+            cube.position.set(
+                (i % gridX) * 2 - 2,
+                -Math.floor(i / gridX) * 2 + 2,
+                0
+            );
+            
+            cube.rotation.x = Math.PI / 4;
+            this.scene.add( cube );
+            this.selectables.push( cube );
+        }
+    
         setTimeout(() => {
             this.loadedCallback();
-        }, 10);
+        }, 3);
 	}
 }

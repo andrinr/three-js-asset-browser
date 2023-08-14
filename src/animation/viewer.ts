@@ -29,20 +29,11 @@ import {
 
 import { Sky } from 'three/examples/jsm/objects/Sky.js';
 // Local imports
-import { loadGLTF } from './loader';
 import { ThreeAnimation } from "./animation";
-import { generateGradientMaterial } from './gradientMaterial';
 import * as dat from 'lil-gui'
 
-interface Map<T> {
-    [key: number]: {
-        name: string,
-        data: T
-    }
-}
+export class Viewer extends ThreeAnimation {
 
-export class Klybeck extends ThreeAnimation {
-	scene: Scene;
     private scale : number;
     private sunPosition : Vector3;
     private displayGui : boolean = true;
@@ -51,6 +42,8 @@ export class Klybeck extends ThreeAnimation {
     private mouseHasMoved : boolean = false;
     private loadedCallback : () => void;
     private gui : dat.GUI;
+
+    private mouseScreenPosition : Vector2 = new Vector2();
 
     public constructor(
         canvas: HTMLCanvasElement, 
@@ -113,31 +106,8 @@ export class Klybeck extends ThreeAnimation {
 
     public update(delta: number): void {
         
-        this.controls.update();
-        console.log(this.camera.position);
     }
     
-    public onMouseMove(event: MouseEvent): void {
-        this.mouseHasMoved = true;
-        const mouse = new Vector2();
-        mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-        mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-    }
-
-    public onMouseUp(event: MouseEvent): void {
-        if(this.mouseHasMoved || !this.mouseOnScreen)
-            return;
-    
-        const mouse = new Vector2();
-        mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-        mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-
-    }
-
-    public onMouseDown(event: MouseEvent): void {
-        this.mouseHasMoved = false;
-    }
-
 	private addSky () {
 		const sky : Sky = new Sky();
 		sky.scale.setScalar( 20 * this.scale / 0.03 );
@@ -183,6 +153,7 @@ export class Klybeck extends ThreeAnimation {
             this.gui.addColor(hemiLight, 'color').name("Hemi Color Sky");
             this.gui.addColor(hemiLight, 'groundColor').name("Hemi Color Ground");
         }
+
         this.scene.add(hemiLight);
         this.scene.add(light);
         this.scene.add(light);
