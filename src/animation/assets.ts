@@ -57,7 +57,7 @@ export class Assets extends ThreeAnimation {
         wrapper: HTMLElement, 
         loadedCallback : () => void
         ) {
-        super(canvas, wrapper, true);
+        super(canvas, wrapper, true, false);
         this.loadedCallback = loadedCallback;
     }
 
@@ -72,26 +72,8 @@ export class Assets extends ThreeAnimation {
         this.renderer.toneMapping = ACESFilmicToneMapping;
         this.renderer.toneMappingExposure = 0.40;
         
-        this.scene.fog = new Fog(0xb4c1c2, 10 * this.scale , 20 * this.scale );
-        this.controls.enableDamping = true;
-        this.controls.enablePan = false;
-        this.controls.enableZoom = true;
-        this.controls.enableRotate = true;
-        this.controls.screenSpacePanning = false;
-        this.controls.panSpeed = 0.5;
-        // auto rotation
-        this.controls.autoRotate = true;
-        this.controls.autoRotateSpeed = 0.1;
+        //this.camera.position.set(1, 1, 1);
 
-        this.camera.position.set(0, -10, 5);
-        //this.controls.maxDistance = 30 * this.scale ;
-        //this.controls.minDistance = 3 * this.scale ;
-    
-        this.controls.mouseButtons = {
-            LEFT: MOUSE.ROTATE,
-            MIDDLE: MOUSE.DOLLY,
-            RIGHT: MOUSE.PAN
-        }
         if (this.displayGui) this.gui = new dat.GUI();
 
         if (this.displayGui){
@@ -106,13 +88,11 @@ export class Assets extends ThreeAnimation {
         this.sunPosition.multiplyScalar( this.scale );
 
         this.addLights();
-        this.addSky();
         this.addModels(); 
     }
 
     public update(delta: number): void {
         
-        this.controls.update();
         console.log(this.camera.position);
     }
     
@@ -137,18 +117,6 @@ export class Assets extends ThreeAnimation {
         this.mouseHasMoved = false;
     }
 
-	private addSky () {
-		const sky : Sky = new Sky();
-		sky.scale.setScalar( 20 * this.scale / 0.03 );
-		this.scene.add( sky );
-
-		const uniforms = sky.material.uniforms;
-		uniforms[ 'turbidity' ].value = 0.6;
-		uniforms[ 'rayleigh' ].value = 0.8;
-		uniforms[ 'mieCoefficient' ].value = 0.01;
-		uniforms[ 'mieDirectionalG' ].value = 0.7;
-		uniforms[ 'sunPosition' ].value.copy( this.sunPosition );
-	}
 
 	private addLights() {
 		const light = new DirectionalLight( "#ffd1d1", 3.5 );
@@ -190,15 +158,10 @@ export class Assets extends ThreeAnimation {
 
 	private async addModels() {
 
-        const plane = new PlaneGeometry(2000, 2000, 8, 8);
-        const planeMesh = new Mesh(plane, new MeshPhongMaterial({color: 0xffffff}));
-        planeMesh.receiveShadow = true;
-        this.scene.add(planeMesh);
-  
-
         const box = new BoxGeometry (1, 1, 1);
         box.translate(0, 0, 1);
-        const boxMesh = new Mesh(box, new MeshPhongMaterial({color: 0xffffff}));
+        //const boxMesh = new Mesh(box, new MeshPhongMaterial({color: 0xffffff}));
+        const boxMesh = new Mesh(box, new MeshBasicMaterial({color: 0xffffff}));
         boxMesh.castShadow = true;
         boxMesh.receiveShadow = true;
         boxMesh.position.set(0, 0, 0);

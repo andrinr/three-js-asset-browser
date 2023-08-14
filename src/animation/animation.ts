@@ -20,8 +20,13 @@ export abstract class ThreeAnimation {
     protected mousePosition : Vector2 = new Vector2(0, 0);
     protected portraitMode : boolean = false;
     protected orthographicCamera : boolean = false;
+    protected useOrbitControls : boolean = false;
 
-    constructor(canvas : HTMLCanvasElement, wrapper : HTMLElement, orthographicCamera : boolean = false) {
+    constructor(
+        canvas : HTMLCanvasElement,
+        wrapper : HTMLElement, 
+        orthographicCamera : boolean = false,
+        useOrbitControls : boolean = true) {
         ThreeAnimation.threeAnimations.push(this);
 
         this.canvas = canvas;
@@ -34,6 +39,7 @@ export abstract class ThreeAnimation {
         this.onMouseLeave = this.onMouseLeave.bind(this);
         this.resize = this.resize.bind(this);
         this.orthographicCamera = orthographicCamera;
+        this.useOrbitControls = useOrbitControls;
 
         canvas.addEventListener( 'mousedown', this.onMouseDown );
         canvas.addEventListener( 'mousemove', this.onMouseMove );
@@ -73,13 +79,19 @@ export abstract class ThreeAnimation {
         );
         this.scene = new Scene();
             
-        if (!this.orthographicCamera) {
+        if (!this.orthographicCamera)
             this.camera = new PerspectiveCamera( 45, this.wrapper.clientWidth / this.wrapper.clientHeight, 0.001, 1000 );
-        }
-        else {
-            this.camera = new OrthographicCamera(1, 1, 1, 1);
-        }
-        this.controls = new OrbitControls( this.camera, this.renderer.domElement );
+        else 
+            this.camera = new OrthographicCamera( 
+                this.wrapper.clientWidth / - 2, 
+                this.wrapper.clientWidth / 2, 
+                this.wrapper.clientHeight / 2, 
+                this.wrapper.clientHeight / - 2, 
+                0.001, 1000 );
+        
+        if (this.useOrbitControls)
+            this.controls = new OrbitControls( this.camera, this.renderer.domElement );
+        
         this.init();
         this.startTime = Date.now();
         this.secondsPassed = 0;
@@ -93,6 +105,8 @@ export abstract class ThreeAnimation {
         const dt : number = Date.now() - this.lastTime;
 		this.lastTime = Date.now();
         this.secondsPassed = (Date.now() - this.startTime) / 1000;
+        if (this.useOrbitControls)
+            this.controls.update();
         this.update(dt);
         this.renderer.render( this.scene, this.camera );
     }
@@ -100,6 +114,12 @@ export abstract class ThreeAnimation {
     public resize(element : HTMLElement) {
         if (!this.orthographicCamera) 
             (this.camera as PerspectiveCamera).aspect = element.offsetWidth / element.offsetHeight;
+        else{
+            (this.camera as OrthographicCamera).left = element.offsetWidth / - 2;
+            (this.camera as OrthographicCamera).right = element.offsetWidth / 2;
+            (this.camera as OrthographicCamera).top = element.offsetHeight / 2;
+            (this.camera as OrthographicCamera).bottom = element.offsetHeight / - 2;
+        }
 
         this.camera.updateProjectionMatrix();
         this.renderer.setSize( element.offsetWidth, element.offsetHeight );
