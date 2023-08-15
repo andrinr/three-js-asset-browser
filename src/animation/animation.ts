@@ -139,7 +139,7 @@ export abstract class ThreeAnimation {
 		this.lastTime = Date.now();
         this.secondsPassed = (Date.now() - this.startTime) / 1000;
 
-        if (this.useOrbitControls)
+        //if (this.useOrbitControls)
             //this.controls.update();
 
         this.update(dt);

@@ -40,6 +40,8 @@ export class Viewer extends ThreeAnimation {
 
     private mouseScreenPosition : Vector2 = new Vector2();
 
+    private selectables : Mesh[];
+
     public constructor(
         canvas: HTMLCanvasElement, 
         wrapper: HTMLElement, 
@@ -66,21 +68,22 @@ export class Viewer extends ThreeAnimation {
         this.renderer.toneMappingExposure = 0.40;
         
         this.controls.enableDamping = true;
-        this.controls.enablePan = true;
+        this.controls.enablePan = false;
         this.controls.enableZoom = true;
-        this.controls.enableRotate = true;
-        this.controls.screenSpacePanning = false;
-        this.controls.panSpeed = 0.5;
-        // auto rotation
-        this.controls.autoRotate = true;
-        this.controls.autoRotateSpeed = 0.1;
-        this.controls.mouseButtons = {
-            LEFT: MOUSE.ROTATE,
-            MIDDLE: MOUSE.DOLLY,
-            RIGHT: MOUSE.PAN
-        }
+        this.controls.enableRotate = false;
+        // this.controls.screenSpacePanning = false;
+        // this.controls.panSpeed = 0.5;
+        // // auto rotation
+        // this.controls.autoRotate = true;
+        // this.controls.autoRotateSpeed = 0.1;
+        // this.controls.mouseButtons = {
+        //     LEFT: MOUSE.ROTATE,
+        //     MIDDLE: MOUSE.DOLLY,
+        //     RIGHT: MOUSE.PAN
+        // }
 
-        this.camera.position.set(0, 5, 5);
+        this.camera.position.set(0, 15, 5);
+        this.camera.lookAt(new Vector3(0,0,0));
         //this.controls.maxDistance = 30 * this.scale ;
         //this.controls.minDistance = 3 * this.scale ;
     
@@ -100,27 +103,23 @@ export class Viewer extends ThreeAnimation {
         this.addLights();
         this.addSky();
         this.addModels(); 
+
+        this.selectables = [];
     }
 
     public addMesh(mesh : Mesh) {
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
         mesh.translateX(Math.random() * 10);
         this.scene.add(mesh);
         console.log("added mesh");
 
-        const origin = mesh.position.clone();
-        const directionX = new Vector3(1, 0, 0);
-        const directionZ = new Vector3(0, 0, 1);
-
-        const arrowX = new ArrowHelper(directionX, origin, 2, 0xff0000, 0.2, 0.2);
-        const arrowY = new ArrowHelper(directionZ, origin, 2, 0x00ff00, 0.2, 0.2);
-
-        this.scene.add(arrowX);
-        this.scene.add(arrowY);
+        this.selectables.push(mesh);
     }
 
     public update(delta: number): void {
         this.raycaster.setFromCamera( this.mousePosition, this.camera );
-        const intersects = this.raycaster.intersectObjects( this.scene.children );
+        const intersects = this.raycaster.intersectObjects( this.selectables);
 
         if (intersects.length > 0) {
             
@@ -147,9 +146,6 @@ export class Viewer extends ThreeAnimation {
 
                 this.selectedObject.position.set(position.x, position.y, position.z);
             }
-        }
-        else {
-            this.controls.update();
         }
     }
 

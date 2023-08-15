@@ -20,11 +20,7 @@ import * as dat from 'lil-gui'
 
 export class Assets extends ThreeAnimation {
 	scene: Scene;
-    private scale : number;
-    private sunPosition : Vector3;
-    private displayGui : boolean;
 
-    private mouseHasMoved : boolean;
     private loadedCallback : () => void;
     private addMeshCallback : (mesh : Mesh) => void;
     private gui : dat.GUI;
@@ -43,14 +39,10 @@ export class Assets extends ThreeAnimation {
         super(canvas, wrapper, true, false);
         this.loadedCallback = loadedCallback;
         this.addMeshCallback = addMeshCallback;
-        this.displayGui = true;
-        this.mouseHasMoved = false;
-
     }
 
     public init(): void {
-        this.scale = 1;
-
+   
         this.selectables = [];
         this.raycaster = new Raycaster();
 
@@ -75,18 +67,13 @@ export class Assets extends ThreeAnimation {
 
         this.gui.add((this.camera as OrthographicCamera), 'near', 0, 100).step(0.1);
         this.gui.add((this.camera as OrthographicCamera), 'far', 0, 100).step(0.1);
-        
-        this.sunPosition = new Vector3(0, 0, 0);
-        const phi : number = MathUtils.degToRad( 90 - 20 );
-        const theta : number = MathUtils.degToRad( 50 );
-        this.sunPosition.setFromSphericalCoords( 1, phi, theta );
-        this.sunPosition.multiplyScalar( this.scale );
 
         this.addLights();
         this.addModels(); 
     }
 
     public update(delta: number): void {
+        console.log('update');
         for (let i = 0; i < this.selectables.length; i++) {
             const element = this.selectables[i];
             //element.rotation.x += 0.01;
@@ -117,9 +104,12 @@ export class Assets extends ThreeAnimation {
             const clone = new Mesh( geometry.clone(), material.clone() );
             this.addMeshCallback(clone);
         }
+
+        //this.controls.update();
     }
 
     private select(mesh : Mesh) {
+        console.log("selected");
         this.selectedObject = mesh;
         mesh.material.color.set(0xff0000);
     }
