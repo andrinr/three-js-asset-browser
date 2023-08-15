@@ -4,23 +4,17 @@ import {
     ACESFilmicToneMapping, 
     Scene, 
     Vector3,
-    DirectionalLight, 
-    AmbientLight,
     Raycaster,
     MathUtils,
     VSMShadowMap,
     Mesh,
     HemisphereLight,
-    Vector2,
-    DirectionalLightHelper,
     OrthographicCamera,
     MeshBasicMaterial,
     BoxGeometry,
     MeshPhongMaterial} from 'three';
 
-
 // Local imports
-import { loadGLTF } from './loader';
 import { ThreeAnimation } from "./animation";
 import * as dat from 'lil-gui'
 
@@ -32,20 +26,23 @@ export class Assets extends ThreeAnimation {
 
     private mouseHasMoved : boolean;
     private loadedCallback : () => void;
+    private addMeshCallback : (mesh : Mesh) => void;
     private gui : dat.GUI;
 
     private selectables : Mesh[];
-    private mesh : Mesh;
 
     private raycaster : Raycaster;
+    private selectedObject : Mesh;
 
     public constructor(
         canvas: HTMLCanvasElement, 
         wrapper: HTMLElement, 
-        loadedCallback : () => void
+        loadedCallback : () => void,
+        addMeshCallback : (mesh : Mesh) => void
         ) {
         super(canvas, wrapper, true, false);
         this.loadedCallback = loadedCallback;
+        this.addMeshCallback = addMeshCallback;
         this.displayGui = true;
         this.mouseHasMoved = false;
 
@@ -97,15 +94,40 @@ export class Assets extends ThreeAnimation {
         }
 
         this.raycaster.setFromCamera( this.mousePosition, this.camera );
-
         const intersects = this.raycaster.intersectObjects( this.selectables );
 
-        //console.log(this.mousePosition);
         if (intersects.length > 0) {
             const intersect = intersects[0];
-            const object = intersect.object;
-            object.material.color.set(0xff0000);
+            const object = intersect.object as Mesh;
+
+            if (object !== this.selectedObject && this.selectedObject !== undefined) {
+                this.unselect();
+            }
+
+            this.select(object);
         }
+        else {
+            this.unselect();
+        }
+
+        if (this.click && this.selectedObject !== undefined) {
+            const geometry = this.selectedObject.geometry;
+            const material = new MeshBasicMaterial( { color: 0xffffff } );
+    
+            const clone = new Mesh( geometry.clone(), material.clone() );
+            this.addMeshCallback(clone);
+        }
+    }
+
+    private select(mesh : Mesh) {
+        this.selectedObject = mesh;
+        mesh.material.color.set(0xff0000);
+    }
+
+    private unselect() {
+        if (this.selectedObject === undefined) return;
+        this.selectedObject.material.color.set(0xffffff);
+        this.selectedObject = undefined;
     }
     
     public onScroll(event: WheelEvent): void {
@@ -116,15 +138,14 @@ export class Assets extends ThreeAnimation {
         this.camera.position.y += delta * 0.01;
     }
 
-
-	private addLights() {
+	private addLights() : void {
         const hemiLight = new HemisphereLight( 0xb0d4ff, 0xfcb928, 1.0 );
         hemiLight.position.set( 0, 50, 0 );
         this.scene.add( hemiLight );
 
 	}
 
-	private async addModels() {
+	private async addModels() : Promise<void> {
 
         const gridX = 3;
 

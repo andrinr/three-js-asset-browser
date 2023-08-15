@@ -17,6 +17,8 @@ export abstract class ThreeAnimation {
     protected controls : OrbitControls;
 
     protected mouseOnScreen : boolean = false;
+    protected mouseDown : boolean = false;
+    protected click : boolean = false;
     protected mousePosition : Vector2 = new Vector2(0, 0);
 
     protected portraitMode : boolean = false;
@@ -78,8 +80,15 @@ export abstract class ThreeAnimation {
         this.mousePosition.y = - ( y / this.canvas.clientHeight ) * 2 + 1;
     }
 
-    public onMouseDown(event : MouseEvent) : void {};
-    public onMouseUp(event : MouseEvent) : void {};
+    public onMouseDown(event : MouseEvent) : void {
+        this.mouseDown = true;
+        this.click = true;
+    };
+
+    public onMouseUp(event : MouseEvent) : void {
+        this.mouseDown = false;
+    };
+
     public onScroll(event : WheelEvent) : void {};
 
     public onMouseLeave(event: MouseEvent): void {
@@ -131,9 +140,11 @@ export abstract class ThreeAnimation {
         this.secondsPassed = (Date.now() - this.startTime) / 1000;
 
         if (this.useOrbitControls)
-            this.controls.update();
+            //this.controls.update();
 
         this.update(dt);
+
+        this.click = false;
 
         this.renderer.render( this.scene, this.camera );
     }

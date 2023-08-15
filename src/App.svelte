@@ -46,9 +46,8 @@
     const wrapperViewer: HTMLElement = document.getElementById("wrapper-viewer");
     const wrapperAssets: HTMLElement = document.getElementById("wrapper-assets");
     buttons = document.getElementById("buttons");
-    
-    assets = new Assets(canvasAssets, wrapperAssets, loadedScene);
     viewer = new Viewer(canvasViewer, wrapperViewer, contentIDCallback, loadedScene);
+    assets = new Assets(canvasAssets, wrapperAssets, loadedScene, viewer.addMesh);
 
   });
 </script>
@@ -78,12 +77,14 @@
   #wrapper-assets {
     position: absolute;
     transition: 0.3s ease-in-out;
-    height: 80%;
+    height: 90%;
     width: 30%;
-    top: 10%;
+    top: 0;
     bottom: 0;
-    right: 10%;
+    right: 0;
+    margin: 10px;
     background-color: white;
+    border-radius: 10px;
   }
 
   canvas {

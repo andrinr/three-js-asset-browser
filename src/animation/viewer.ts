@@ -2,28 +2,19 @@
 import { 
     sRGBEncoding, 
     ACESFilmicToneMapping, 
-    Scene, 
-    Fog, 
     Vector3,
     DirectionalLight, 
     AmbientLight,
     MathUtils,
     VSMShadowMap,
-    PCFShadowMap,
     Mesh,
-    Color,
+    ArrowHelper,
     MOUSE,
     HemisphereLight,
     Raycaster,
     Vector2,
-    Object3D,
-    TOUCH,
-    ShaderMaterial,
     DirectionalLightHelper,
-    Plane,
     MeshPhongMaterial,
-    PlaneBufferGeometry,
-    MeshBasicMaterial,
     PlaneGeometry,
     BoxGeometry} from 'three';
 
@@ -37,11 +28,15 @@ export class Viewer extends ThreeAnimation {
     private scale : number;
     private sunPosition : Vector3;
     private displayGui : boolean = true;
-    private floor : Mesh;
+    private floorPlane : Mesh;
 
     private mouseHasMoved : boolean = false;
     private loadedCallback : () => void;
     private gui : dat.GUI;
+
+    private selectedObject : Mesh;
+
+    private raycaster : Raycaster;
 
     private mouseScreenPosition : Vector2 = new Vector2();
 
@@ -51,12 +46,16 @@ export class Viewer extends ThreeAnimation {
         contentIDCallback : (id : number) => void,
         loadedCallback : () => void
         ) {
-        super(canvas, wrapper);
+        super(canvas, wrapper, false, true);
         this.loadedCallback = loadedCallback;
+
+        this.addMesh = this.addMesh.bind(this);
     }
 
     public init(): void {
         this.scale = 1;
+
+        this.raycaster = new Raycaster();
 
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = VSMShadowMap; // 
@@ -66,9 +65,8 @@ export class Viewer extends ThreeAnimation {
         this.renderer.toneMapping = ACESFilmicToneMapping;
         this.renderer.toneMappingExposure = 0.40;
         
-        this.scene.fog = new Fog(0xb4c1c2, 10 * this.scale , 20 * this.scale );
         this.controls.enableDamping = true;
-        this.controls.enablePan = false;
+        this.controls.enablePan = true;
         this.controls.enableZoom = true;
         this.controls.enableRotate = true;
         this.controls.screenSpacePanning = false;
@@ -76,16 +74,16 @@ export class Viewer extends ThreeAnimation {
         // auto rotation
         this.controls.autoRotate = true;
         this.controls.autoRotateSpeed = 0.1;
-
-        this.camera.position.set(0, -10, 5);
-        //this.controls.maxDistance = 30 * this.scale ;
-        //this.controls.minDistance = 3 * this.scale ;
-    
         this.controls.mouseButtons = {
             LEFT: MOUSE.ROTATE,
             MIDDLE: MOUSE.DOLLY,
             RIGHT: MOUSE.PAN
         }
+
+        this.camera.position.set(0, 5, 5);
+        //this.controls.maxDistance = 30 * this.scale ;
+        //this.controls.minDistance = 3 * this.scale ;
+    
         if (this.displayGui) this.gui = new dat.GUI();
 
         if (this.displayGui){
@@ -104,8 +102,66 @@ export class Viewer extends ThreeAnimation {
         this.addModels(); 
     }
 
+    public addMesh(mesh : Mesh) {
+        mesh.translateX(Math.random() * 10);
+        this.scene.add(mesh);
+        console.log("added mesh");
+
+        const origin = mesh.position.clone();
+        const directionX = new Vector3(1, 0, 0);
+        const directionZ = new Vector3(0, 0, 1);
+
+        const arrowX = new ArrowHelper(directionX, origin, 2, 0xff0000, 0.2, 0.2);
+        const arrowY = new ArrowHelper(directionZ, origin, 2, 0x00ff00, 0.2, 0.2);
+
+        this.scene.add(arrowX);
+        this.scene.add(arrowY);
+    }
+
     public update(delta: number): void {
-        
+        this.raycaster.setFromCamera( this.mousePosition, this.camera );
+        const intersects = this.raycaster.intersectObjects( this.scene.children );
+
+        if (intersects.length > 0) {
+            
+            const intersect = intersects[0];
+            const object = intersect.object as Mesh;
+
+            if (object !== this.selectedObject && this.selectedObject !== undefined) {
+                this.unselect();
+            }
+
+            this.select(object);
+        }
+        else {
+            this.unselect();
+        }
+
+        if (this.mouseDown && !this.click && this.selectedObject !== undefined) {
+            const intersections = this.raycaster.intersectObject(this.floorPlane);
+
+            if (intersections.length > 0) {
+                const intersection = intersections[0];
+
+                const position = intersection.point;
+
+                this.selectedObject.position.set(position.x, position.y, position.z);
+            }
+        }
+        else {
+            this.controls.update();
+        }
+    }
+
+    private select(mesh : Mesh) {
+        this.selectedObject = mesh;
+        mesh.material.color.set(0xff0000);
+    }
+
+    private unselect() {
+        if (this.selectedObject === undefined) return;
+        this.selectedObject.material.color.set(0xffffff);
+        this.selectedObject = undefined;
     }
     
 	private addSky () {
@@ -162,11 +218,15 @@ export class Viewer extends ThreeAnimation {
 
 	private async addModels() {
 
-        const plane = new PlaneGeometry(2000, 2000, 8, 8);
-        const planeMesh = new Mesh(plane, new MeshPhongMaterial({color: 0xffffff}));
-        planeMesh.receiveShadow = true;
-        this.scene.add(planeMesh);
-  
+        const planeNormal = new Vector3(0, 1, 0);
+        const planeY = -1;
+        const floor = new PlaneGeometry(2000, 2000, 8, 8);
+        const floorMesh = new Mesh(floor, new MeshPhongMaterial({color: 0xffffff}));
+        this.floorPlane = floorMesh;
+        floorMesh.position.set(0, planeY, 0);
+        floorMesh.rotateX(-Math.PI / 2);
+        floorMesh.receiveShadow = true;
+        this.scene.add(floorMesh);
 
         const box = new BoxGeometry (1, 1, 1);
         box.translate(0, 0, 1);
