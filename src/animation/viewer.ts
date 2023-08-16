@@ -8,8 +8,11 @@ import {
     MathUtils,
     VSMShadowMap,
     Mesh,
-    ArrowHelper,
-    MOUSE,
+    Shape,
+    DoubleSide,
+    ExtrudeGeometry,
+    ExtrudeGeometryOptions,
+    MeshBasicMaterial,
     HemisphereLight,
     Raycaster,
     Vector2,
@@ -131,9 +134,13 @@ export class Viewer extends ThreeAnimation {
             }
 
             this.select(object);
+
+            this.wrapper.style.cursor = 'grab';
         }
-        else {
+        else if (this.mouseDown == false) {
+            console.log('unselect');
             this.unselect();
+            this.wrapper.style.cursor = 'default';
         }
 
         if (this.mouseDown && !this.click && this.selectedObject !== undefined) {
@@ -144,7 +151,9 @@ export class Viewer extends ThreeAnimation {
 
                 const position = intersection.point;
 
-                this.selectedObject.position.set(position.x, position.y, position.z);
+                const prevY = this.selectedObject.position.y;
+
+                this.selectedObject.position.set(position.x, prevY, position.z);
             }
         }
     }
@@ -175,7 +184,7 @@ export class Viewer extends ThreeAnimation {
 
 	private addLights() {
 		const light = new DirectionalLight( "#ffd1d1", 3.5 );
-	    light.position.multiplyScalar(0).add(this.sunPosition.clone().multiplyScalar(this.scale * 10));
+	    light.position.multiplyScalar(0).add(this.sunPosition.clone().multiplyScalar(this.scale * 30));
 
 		light.castShadow = true;
 
@@ -224,13 +233,32 @@ export class Viewer extends ThreeAnimation {
         floorMesh.receiveShadow = true;
         this.scene.add(floorMesh);
 
-        const box = new BoxGeometry (1, 1, 1);
-        box.translate(0, 0, 1);
-        const boxMesh = new Mesh(box, new MeshPhongMaterial({color: 0xffffff}));
-        boxMesh.castShadow = true;
-        boxMesh.receiveShadow = true;
-        boxMesh.position.set(0, 0, 0);
-        this.scene.add(boxMesh);
+        // const outline = new Shape();
+
+        // const size = 5;
+
+        // outline.moveTo(size, size);
+        // outline.lineTo(-size, size);
+        // outline.lineTo(-size, -size);
+        // outline.lineTo(size, -size);
+
+        // const extrudeSettings : ExtrudeGeometryOptions = {
+        //     steps: 2,
+        //     depth: 16,
+        //     bevelEnabled: false,
+        // };
+        
+        // const geometry = new ExtrudeGeometry( outline, extrudeSettings );
+        // const material = new MeshBasicMaterial( { color: 0x00ff00 } );
+
+        // material.side = DoubleSide;
+
+        // const mesh = new Mesh(geometry, material);
+        // mesh.position.set(0, -3, 0);
+        
+        // mesh.rotateX(-Math.PI / 2);
+
+        // this.scene.add(mesh);
 
         setTimeout(() => {
             this.loadedCallback();

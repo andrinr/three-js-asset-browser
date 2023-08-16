@@ -5,7 +5,7 @@ import {
     Scene, 
     Vector3,
     Raycaster,
-    MathUtils,
+    SphereGeometry,
     VSMShadowMap,
     Mesh,
     HemisphereLight,
@@ -99,9 +99,9 @@ export class Assets extends ThreeAnimation {
 
         if (this.click && this.selectedObject !== undefined) {
             const geometry = this.selectedObject.geometry;
-            const material = new MeshBasicMaterial( { color: 0xffffff } );
+            const material = new MeshPhongMaterial({color: 0xffffff});
     
-            const clone = new Mesh( geometry.clone(), material.clone() );
+            const clone = new Mesh( geometry.clone(), material );
             this.addMeshCallback(clone);
         }
 
@@ -140,7 +140,12 @@ export class Assets extends ThreeAnimation {
         const gridX = 3;
 
         for (let i = 0; i < 40; i++) {
-            const geometry = new BoxGeometry( 1, 1, 1 );
+
+            let geometry : BoxGeometry | SphereGeometry = new BoxGeometry( 1, 1, 1 );
+            
+            if (Math.random() > 0.5) {
+                geometry = new SphereGeometry(0.5);
+            }
             const material = new MeshPhongMaterial( { color: 0xffffff } );
             const cube = new Mesh( geometry, material );
 
