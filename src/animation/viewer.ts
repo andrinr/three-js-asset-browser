@@ -25,6 +25,7 @@ import { Sky } from 'three/examples/jsm/objects/Sky.js';
 // Local imports
 import { ThreeAnimation } from "./animation";
 import * as dat from 'lil-gui'
+import { loadGLTF } from './loader';
 
 export class Viewer extends ThreeAnimation {
 
@@ -85,7 +86,7 @@ export class Viewer extends ThreeAnimation {
         //     RIGHT: MOUSE.PAN
         // }
 
-        this.camera.position.set(0, 15, 5);
+        this.camera.position.set(0, 15, 10);
         this.camera.lookAt(new Vector3(0,0,0));
         //this.controls.maxDistance = 30 * this.scale ;
         //this.controls.minDistance = 3 * this.scale ;
@@ -115,7 +116,6 @@ export class Viewer extends ThreeAnimation {
         mesh.receiveShadow = true;
         mesh.translateX(Math.random() * 10);
         this.scene.add(mesh);
-        console.log("added mesh");
 
         this.selectables.push(mesh);
     }
@@ -138,7 +138,6 @@ export class Viewer extends ThreeAnimation {
             this.wrapper.style.cursor = 'grab';
         }
         else if (this.mouseDown == false) {
-            console.log('unselect');
             this.unselect();
             this.wrapper.style.cursor = 'default';
         }
@@ -160,7 +159,7 @@ export class Viewer extends ThreeAnimation {
 
     private select(mesh : Mesh) {
         this.selectedObject = mesh;
-        mesh.material.color.set(0xff0000);
+        mesh.material.color.set(0xffff00);
     }
 
     private unselect() {
@@ -232,6 +231,8 @@ export class Viewer extends ThreeAnimation {
         floorMesh.rotateX(-Math.PI / 2);
         floorMesh.receiveShadow = true;
         this.scene.add(floorMesh);
+
+        //  loadGLTF('./models/model4.gltf', this.scene);
 
         // const outline = new Shape();
 

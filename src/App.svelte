@@ -53,38 +53,35 @@
 </script>
 
 <main>
-  <div id="wrapper-viewer" class="wrapper" use:watchResize={resizeViewer}>
-    <canvas id="canvas-viewer" />
-  </div>
-  <div id="wrapper-assets" class="wrapper" use:watchResize={resizeAssets}>
-    <canvas id="canvas-assets" />
+  <div class="configurator">
+    <div id="wrapper-viewer" use:watchResize={resizeViewer}>
+      <canvas id="canvas-viewer" />
+    </div>
+    <div id="wrapper-assets" use:watchResize={resizeAssets}>
+      <canvas id="canvas-assets" />
+    </div>
   </div>
 </main>
 
 <svelte:window/>
 
 <style>
+
+  .configurator {
+    display: flex;
+    flex-direction: row;
+    width: 100vw;
+    height: 100vh;
+  }
+
   #wrapper-viewer {
-    position: absolute;
-    transition: 0.3s ease-in-out;
-    height: 100%;
-    width: 100%;
-    top: 0;
-    left: 0;
-    bottom: 0;
+    width: 70vw;
   }
 
   #wrapper-assets {
-    position: absolute;
-    transition: 0.3s ease-in-out;
-    height: 90%;
-    width: 30%;
-    top: 0;
-    bottom: 0;
-    right: 0;
-    margin: 10px;
-    background-color: white;
-    border-radius: 10px;
+    width: 30vw;
+    border-left: solid black;
+    border-width: 3px;
   }
 
   canvas {

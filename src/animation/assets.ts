@@ -56,28 +56,18 @@ export class Assets extends ThreeAnimation {
         
         //this.camera.position.set(1, 1, 1);
 
-        this.gui = new dat.GUI();
-
         this.camera.position.set(0, 0, 10);
         this.camera.zoom = 100;
-
-        this.gui.add(this.camera.position, 'x', -100, 100).step(0.1);
-        this.gui.add(this.camera.position, 'y', -100, 100).step(0.1);
-        this.gui.add(this.camera.position, 'z', -100, 100).step(0.1);
-
-        this.gui.add((this.camera as OrthographicCamera), 'near', 0, 100).step(0.1);
-        this.gui.add((this.camera as OrthographicCamera), 'far', 0, 100).step(0.1);
 
         this.addLights();
         this.addModels(); 
     }
 
     public update(delta: number): void {
-        console.log('update');
         for (let i = 0; i < this.selectables.length; i++) {
             const element = this.selectables[i];
             //element.rotation.x += 0.01;
-            element.rotation.y += 0.001;
+            element.rotation.y += 0.01;
         }
 
         this.raycaster.setFromCamera( this.mousePosition, this.camera );
@@ -109,9 +99,8 @@ export class Assets extends ThreeAnimation {
     }
 
     private select(mesh : Mesh) {
-        console.log("selected");
         this.selectedObject = mesh;
-        mesh.material.color.set(0xff0000);
+        mesh.material.color.set(0xffff00);
     }
 
     private unselect() {
@@ -129,7 +118,7 @@ export class Assets extends ThreeAnimation {
     }
 
 	private addLights() : void {
-        const hemiLight = new HemisphereLight( 0xb0d4ff, 0xfcb928, 1.0 );
+        const hemiLight = new HemisphereLight( 0xffffff, 0xbbbbbb, 1.0 );
         hemiLight.position.set( 0, 50, 0 );
         this.scene.add( hemiLight );
 
@@ -144,7 +133,7 @@ export class Assets extends ThreeAnimation {
             let geometry : BoxGeometry | SphereGeometry = new BoxGeometry( 1, 1, 1 );
             
             if (Math.random() > 0.5) {
-                geometry = new SphereGeometry(0.5);
+                geometry = new SphereGeometry(0.5, 5, 5);
             }
             const material = new MeshPhongMaterial( { color: 0xffffff } );
             const cube = new Mesh( geometry, material );
