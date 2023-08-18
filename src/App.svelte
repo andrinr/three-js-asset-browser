@@ -1,26 +1,19 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { watchResize } from "svelte-watch-resize";
-  //import { Klybeck } from "./animation/klybeck";
   import { AssetsAnimation } from "./ts/assetsAnimation";
-
-  // @ts-ignore
   import { MainAnimation } from "./ts/mainAnimation";
-    import Assets from "./components/Assets.svelte";
+  import Assets from "./components/Assets.svelte";
 
-  let main: MainAnimation;
-  let assets : AssetsAnimation;
+  let mainAnimation: MainAnimation;
+  let assetsAnimation : AssetsAnimation;
 
   const resizeViewer = (element: HTMLElement) => {
-    if (main) {
-      main.resize(element);
-    }
+    if (mainAnimation) mainAnimation.resize(element);
   };
 
   const resizeAssets = (element: HTMLElement) => {
-    if (assets) {
-      assets.resize(element);
-    }
+    if (assetsAnimation) assetsAnimation.resize(element);
   };
 
   const loadedScene = () => {
@@ -28,6 +21,10 @@
     //document.getElementById("loading-screen").style.display = "none";
   };
 
+  mainAnimation = new MainAnimation(loadedScene);
+  assetsAnimation = new AssetsAnimation(loadedScene, mainAnimation.addMesh);
+
+  console.log(assetsAnimation);
   onMount(async () => {
     const canvasViewer: HTMLCanvasElement = document.getElementById(
       "canvas-viewer"
@@ -39,9 +36,9 @@
     const wrapperViewer: HTMLElement = document.getElementById("wrapper-viewer");
     const wrapperAssets: HTMLElement = document.getElementById("wrapper-assets");
 
-    main = new MainAnimation(canvasViewer, wrapperViewer, loadedScene);
-    assets = new AssetsAnimation(canvasAssets, wrapperAssets, loadedScene, main.addMesh);
-
+    mainAnimation.setElements(canvasViewer, wrapperViewer);
+    assetsAnimation.setElements(canvasAssets, wrapperAssets);
+    
   });
 </script>
 
@@ -55,7 +52,7 @@
     </div>
 
     <div id="assets-html" class="assets">
-      <Assets updateAssets={assets.updateAssets}/>
+      <Assets updateAssets={assetsAnimation.updateAssets}/>   
     </div>
 
   </div>

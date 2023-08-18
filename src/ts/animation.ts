@@ -26,36 +26,18 @@ export abstract class ThreeAnimation {
     protected useOrbitControls : boolean = false;
 
     constructor(
-        canvas : HTMLCanvasElement,
-        wrapper : HTMLElement, 
         orthographicCamera : boolean = false,
         useOrbitControls : boolean = true) {
         ThreeAnimation.threeAnimations.push(this);
 
-        this.canvas = canvas;
-        this.wrapper = wrapper;
         this.loop = this.loop.bind(this);
-
         this.onMouseMove = this.onMouseMove.bind(this);
-        canvas.addEventListener( 'mousemove', this.onMouseMove );
-
         this.onMouseDown = this.onMouseDown.bind(this);
-        canvas.addEventListener( 'mousedown', this.onMouseDown );
-
         this.onMouseUp = this.onMouseUp.bind(this);
-        canvas.addEventListener( 'mouseup', this.onMouseUp );
-
         this.onScroll = this.onScroll.bind(this);
-        canvas.addEventListener( 'wheel', this.onScroll );
-
         this.onMouseOver = this.onMouseOver.bind(this);
-        canvas.addEventListener( 'mouseover', this.onMouseOver );
-
         this.onMouseLeave = this.onMouseLeave.bind(this);
-        canvas.addEventListener( 'mouseleave', this.onMouseLeave );
-
         this.update = this.update.bind(this);
-
         this.resize = this.resize.bind(this);
         
         this.orthographicCamera = orthographicCamera;
@@ -63,6 +45,19 @@ export abstract class ThreeAnimation {
 
         this.mouseOnScreen = false;
         this.mousePosition = new Vector2(0, 0);
+
+    }
+
+    public setElements(canvas : HTMLCanvasElement, wrapper : HTMLElement) : void {
+        this.canvas = canvas;
+        this.wrapper = wrapper;
+
+        canvas.addEventListener( 'mousemove', this.onMouseMove );
+        canvas.addEventListener( 'mousedown', this.onMouseDown );
+        canvas.addEventListener( 'mouseup', this.onMouseUp );
+        canvas.addEventListener( 'wheel', this.onScroll );
+        canvas.addEventListener( 'mouseover', this.onMouseOver );
+        canvas.addEventListener( 'mouseleave', this.onMouseLeave );
 
         this.start();
     }

@@ -2,8 +2,9 @@
 import { 
     sRGBEncoding, 
     ACESFilmicToneMapping, 
-    Scene, 
+    PlaneGeometry, 
     Raycaster,
+    Vector2,
     SphereGeometry,
     VSMShadowMap,
     Mesh,
@@ -19,6 +20,7 @@ export class AssetsAnimation extends ThreeAnimation {
 
     private loadedCallback : () => void;
     private addMeshCallback : (mesh : Mesh) => void;
+    private floorPlane : Mesh;
 
     private assetMeshes : Mesh[];
 
@@ -26,12 +28,10 @@ export class AssetsAnimation extends ThreeAnimation {
     private selectedObject : Mesh;
 
     public constructor(
-        canvas: HTMLCanvasElement, 
-        wrapper: HTMLElement, 
         loadedCallback : () => void,
         addMeshCallback : (mesh : Mesh) => void
         ) {
-        super(canvas, wrapper, true, false);
+        super(true, false);
         this.loadedCallback = loadedCallback;
         this.addMeshCallback = addMeshCallback;
 
@@ -117,11 +117,24 @@ export class AssetsAnimation extends ThreeAnimation {
     }
 
     public updateAssets(assets : AssetInstance[]) {
+
+        console.log(assets);
         for (let i = 0; i < assets.length; i++) {
-            const asset = assets[i];
+            const pos = new Vector2(assets[i].posX, assets[i].posY);
 
-            this.assetMeshes[i].position.set(asset.posX, asset.posY, 0);
+            this.raycaster.setFromCamera(pos, this.camera);
 
+            const intersects = this.raycaster.intersectObject(this.floorPlane);
+
+            if (intersects.length > 0) {
+                const intersect = intersects[0];
+                const point = intersect.point;
+
+                console.log(point);
+
+                const prevY = this.assetMeshes[i].position.y;
+                this.assetMeshes[i].position.set(point.x, point.y, point.z);
+            }
         }
     }
 
@@ -134,9 +147,17 @@ export class AssetsAnimation extends ThreeAnimation {
 
 	private async addModels() : Promise<void> {
 
-        const gridX = 3;
+        const planeY = -1;
+        const floor = new PlaneGeometry(2000, 2000, 8, 8);
+        const floorMesh = new Mesh(floor, new MeshPhongMaterial({color: 0xff000}));
+        this.floorPlane = floorMesh;
+        floorMesh.position.set(0, planeY, 0);
+        //floorMesh.rotateX(-Math.PI / 2);
+        floorMesh.receiveShadow = true;
 
-        for (let i = 0; i < 40; i++) {
+        //this.scene.add(floorMesh);
+
+        for (let i = 0; i < 20; i++) {
 
             let geometry : BoxGeometry | SphereGeometry = new BoxGeometry( 1, 1, 1 );
             

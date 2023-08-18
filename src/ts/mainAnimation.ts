@@ -31,7 +31,7 @@ export class MainAnimation extends ThreeAnimation {
 
     private scale : number;
     private sunPosition : Vector3;
-    private displayGui : boolean = true;
+    private displayGui : boolean = false;
     private floorPlane : Mesh;
 
     private mouseHasMoved : boolean = false;
@@ -47,11 +47,9 @@ export class MainAnimation extends ThreeAnimation {
     private selectables : Mesh[];
 
     public constructor(
-        canvas: HTMLCanvasElement, 
-        wrapper: HTMLElement, 
         loadedCallback : () => void
         ) {
-        super(canvas, wrapper, false, true);
+        super(false, true);
         this.loadedCallback = loadedCallback;
 
         this.addMesh = this.addMesh.bind(this);
@@ -223,7 +221,6 @@ export class MainAnimation extends ThreeAnimation {
 
 	private async addModels() {
 
-        const planeNormal = new Vector3(0, 1, 0);
         const planeY = -1;
         const floor = new PlaneGeometry(2000, 2000, 8, 8);
         const floorMesh = new Mesh(floor, new MeshPhongMaterial({color: 0x999999}));
