@@ -13,13 +13,14 @@ import {
 
 // Local imports
 import { ThreeAnimation } from "./animation";
+import type AssetInstance from './assetInstance';
 
 export class AssetsAnimation extends ThreeAnimation {
 
     private loadedCallback : () => void;
     private addMeshCallback : (mesh : Mesh) => void;
 
-    private selectables : Mesh[];
+    private assetMeshes : Mesh[];
 
     private raycaster : Raycaster;
     private selectedObject : Mesh;
@@ -33,11 +34,13 @@ export class AssetsAnimation extends ThreeAnimation {
         super(canvas, wrapper, true, false);
         this.loadedCallback = loadedCallback;
         this.addMeshCallback = addMeshCallback;
+
+        this.updateAssets = this.updateAssets.bind(this);
     }
 
     public init(): void {
    
-        this.selectables = [];
+        this.assetMeshes = [];
         this.raycaster = new Raycaster();
 
         this.renderer.shadowMap.enabled = true;
@@ -58,14 +61,14 @@ export class AssetsAnimation extends ThreeAnimation {
     }
 
     public update(delta: number): void {
-        for (let i = 0; i < this.selectables.length; i++) {
-            const element = this.selectables[i];
+        for (let i = 0; i < this.assetMeshes.length; i++) {
+            const element = this.assetMeshes[i];
             //element.rotation.x += 0.01;
             element.rotation.y += 0.01;
         }
 
         this.raycaster.setFromCamera( this.mousePosition, this.camera );
-        const intersects = this.raycaster.intersectObjects( this.selectables );
+        const intersects = this.raycaster.intersectObjects( this.assetMeshes );
 
         if (intersects.length > 0) {
             const intersect = intersects[0];
@@ -113,6 +116,15 @@ export class AssetsAnimation extends ThreeAnimation {
         this.camera.position.y += delta * 0.01;
     }
 
+    public updateAssets(assets : AssetInstance[]) {
+        for (let i = 0; i < assets.length; i++) {
+            const asset = assets[i];
+
+            this.assetMeshes[i].position.set(asset.posX, asset.posY, 0);
+
+        }
+    }
+
 	private addLights() : void {
         const hemiLight = new HemisphereLight( 0xffffff, 0xbbbbbb, 1.0 );
         hemiLight.position.set( 0, 50, 0 );
@@ -134,15 +146,9 @@ export class AssetsAnimation extends ThreeAnimation {
             const material = new MeshPhongMaterial( { color: 0xffffff } );
             const cube = new Mesh( geometry, material );
 
-            cube.position.set(
-                (i % gridX) * 2 - 2,
-                -Math.floor(i / gridX) * 2 + 2,
-                0
-            );
-            
             cube.rotation.x = Math.PI / 4;
             this.scene.add( cube );
-            this.selectables.push( cube );
+            this.assetMeshes.push( cube );
         }
     
         setTimeout(() => {

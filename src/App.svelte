@@ -55,7 +55,7 @@
     </div>
 
     <div id="assets-html" class="assets">
-      <Assets/>
+      <Assets updateAssets={assets.updateAssets}/>
     </div>
 
   </div>
@@ -89,8 +89,14 @@
     top: 0;
   }
 
+  #wrapper-assets {
+    pointer-events: none;
+    z-index: 5;
+  }
+
   #assets-html {
-    z-index: -10;
+    z-index: 2;
+    overflow-y: scroll;
   }
 
   canvas {
