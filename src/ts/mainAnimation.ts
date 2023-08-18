@@ -27,7 +27,7 @@ import { ThreeAnimation } from "./animation";
 import * as dat from 'lil-gui'
 import { loadGLTF } from './loader';
 
-export class Viewer extends ThreeAnimation {
+export class MainAnimation extends ThreeAnimation {
 
     private scale : number;
     private sunPosition : Vector3;
@@ -49,7 +49,6 @@ export class Viewer extends ThreeAnimation {
     public constructor(
         canvas: HTMLCanvasElement, 
         wrapper: HTMLElement, 
-        contentIDCallback : (id : number) => void,
         loadedCallback : () => void
         ) {
         super(canvas, wrapper, false, true);
@@ -159,11 +158,13 @@ export class Viewer extends ThreeAnimation {
 
     private select(mesh : Mesh) {
         this.selectedObject = mesh;
+        // @ts-ignore
         mesh.material.color.set(0xffff00);
     }
 
     private unselect() {
         if (this.selectedObject === undefined) return;
+        // @ts-ignore
         this.selectedObject.material.color.set(0xffffff);
         this.selectedObject = undefined;
     }

@@ -2,25 +2,17 @@
   import { onMount } from "svelte";
   import { watchResize } from "svelte-watch-resize";
   //import { Klybeck } from "./animation/klybeck";
-  import { Assets } from "./animation/assets";
+  import { AssetsAnimation } from "./ts/assetsAnimation";
 
   // @ts-ignore
-  import * as data from "./content.json";
-  import { Viewer } from "./animation/viewer";
+  import { MainAnimation } from "./ts/mainAnimation";
 
-  let contentId = 0;
-  let buttons: HTMLElement;
-
-  const contentIDCallback = (id: number) => {
-    contentId = id;
-  };
-
-  let viewer: Viewer;
-  let assets : Assets;
+  let main: MainAnimation;
+  let assets : AssetsAnimation;
 
   const resizeViewer = (element: HTMLElement) => {
-    if (viewer) {
-      viewer.resize(element);
+    if (main) {
+      main.resize(element);
     }
   };
 
@@ -45,9 +37,9 @@
     
     const wrapperViewer: HTMLElement = document.getElementById("wrapper-viewer");
     const wrapperAssets: HTMLElement = document.getElementById("wrapper-assets");
-    buttons = document.getElementById("buttons");
-    viewer = new Viewer(canvasViewer, wrapperViewer, contentIDCallback, loadedScene);
-    assets = new Assets(canvasAssets, wrapperAssets, loadedScene, viewer.addMesh);
+
+    main = new MainAnimation(canvasViewer, wrapperViewer, loadedScene);
+    assets = new AssetsAnimation(canvasAssets, wrapperAssets, loadedScene, main.addMesh);
 
   });
 </script>

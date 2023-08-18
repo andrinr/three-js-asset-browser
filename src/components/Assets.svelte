@@ -1,7 +1,8 @@
 <script lang="ts">
-  import type Asset from "../animation/asset";
+  import type AssetInstance from "../ts/assetInstance";
+  import Asset from "./Asset.svelte";
 
-  let assets : Asset[] = [];
+  let assets : AssetInstance[] = [];
 
   for (let i = 0; i < 20; i++) {
     assets.push(
@@ -18,7 +19,7 @@
 <div class="container">
   {#each assets as asset}
     <div class="item">
-      <Asset {asset} />
+      {Asset.name}
     </div>
   {/each}
 </div>

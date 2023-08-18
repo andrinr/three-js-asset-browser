@@ -3,27 +3,21 @@ import {
     sRGBEncoding, 
     ACESFilmicToneMapping, 
     Scene, 
-    Vector3,
     Raycaster,
     SphereGeometry,
     VSMShadowMap,
     Mesh,
     HemisphereLight,
-    OrthographicCamera,
-    MeshBasicMaterial,
     BoxGeometry,
     MeshPhongMaterial} from 'three';
 
 // Local imports
 import { ThreeAnimation } from "./animation";
-import * as dat from 'lil-gui'
 
-export class Assets extends ThreeAnimation {
-	scene: Scene;
+export class AssetsAnimation extends ThreeAnimation {
 
     private loadedCallback : () => void;
     private addMeshCallback : (mesh : Mesh) => void;
-    private gui : dat.GUI;
 
     private selectables : Mesh[];
 
@@ -100,11 +94,13 @@ export class Assets extends ThreeAnimation {
 
     private select(mesh : Mesh) {
         this.selectedObject = mesh;
+        // @ts-ignore
         mesh.material.color.set(0xffff00);
     }
 
     private unselect() {
         if (this.selectedObject === undefined) return;
+        // @ts-ignore
         this.selectedObject.material.color.set(0xffffff);
         this.selectedObject = undefined;
     }
