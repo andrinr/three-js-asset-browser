@@ -13,16 +13,11 @@ export class DragAnimation extends ThreeAnimation {
 
     private mesh : Mesh;
     public constructor(
-        mesh : Mesh
         ) {
         super(true, false);
-
-        this.mesh = mesh;
     }
 
     public init(): void {
-
-        
         //this.camera.position.set(1, 1, 1);
 
         this.camera.position.set(0, 0, 10);
@@ -30,6 +25,14 @@ export class DragAnimation extends ThreeAnimation {
 
         this.addLights();
         this.addModels(); 
+    }
+
+    public setMesh(mesh: Mesh) : void {
+        if (this.mesh != null)
+            this.scene.remove(this.mesh);
+        
+        this.mesh = mesh;
+        this.scene.add(this.mesh);
     }
 
     public update(delta: number): void {

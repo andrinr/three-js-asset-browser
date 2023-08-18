@@ -1,22 +1,34 @@
 <script lang="ts">
   import type AssetInstance from "../ts/assetInstance";
   import { watchResize } from "svelte-watch-resize";
-  import Asset from "./Asset.svelte";
+  import { Mesh, BoxGeometry, MeshPhongMaterial, SphereGeometry } from "three";
 
   let assets : AssetInstance[] = [];
   export let updateAssets : (assets : AssetInstance[]) => void;
+  export let startDrag : (mesh : Mesh) => void;
 
   const nItems = 20;
 
   for (let i = 0; i < nItems; i++) {
+    let geometry : BoxGeometry | SphereGeometry = new BoxGeometry( 0.5, 0.5, 0.5 );
+            
+    if (Math.random() > 0.5) {
+        geometry = new SphereGeometry(0.5, 5, 5);
+    }
+    const material = new MeshPhongMaterial( { color: 0xffffff } );
+    const mesh = new Mesh( geometry, material );
+
+    mesh.rotateX(Math.PI / 4);
+
     assets.push(
       {
         name : 'Asset Name',
-        path : 'alkd',
+        mesh : mesh,
         focused : false,
         visible : true,
         posX : 0,
         posY : 0,
+        id : i
       }
     )
   };
@@ -53,6 +65,7 @@
   <div class="container" on:wheel={update} use:watchResize={update} bind:this={assetsHtml} >
   
     {#each assets as asset, i}
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
       <div 
         class="item" 
         id="item-{i}" 
@@ -62,11 +75,15 @@
             updateAssets(assets);
           }
         }
-
         on:mouseleave={
           () => {
             assets[i].focused = false;
             updateAssets(assets);
+          }
+        }
+        on:click={
+          () => {
+            startDrag(assets[i].mesh);
           }
         }
       >

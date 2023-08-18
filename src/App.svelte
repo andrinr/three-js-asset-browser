@@ -5,12 +5,10 @@
   import { MainAnimation } from "./ts/mainAnimation";
   import { DragAnimation } from "./ts/dragAnimation";
   import Assets from "./components/Assets.svelte";
-  import Drag from "./components/Drag.svelte";
 
   let mainAnimation: MainAnimation;
   let assetsAnimation : AssetsAnimation;
-  let dragMesh : Mesh | undefined;
-  let dragWrapper : HTMLElement;
+  let dragAnimation : DragAnimation;
 
   const resizeViewer = (element: HTMLElement) => {
     if (mainAnimation) mainAnimation.resize(element);
@@ -20,14 +18,19 @@
     if (assetsAnimation) assetsAnimation.resize(element);
   };
 
-  const dragCallback = (mesh) => {
-    dragMesh = mesh;
+  const startDrag = (mesh) => {
+    if (dragAnimation) dragAnimation.setMesh(mesh);
+
+    const dragWrapper = document.getElementById("wrapper-drag");
+    dragWrapper.style.display = "block";
   };
 
   const onMouseMove = (event) => {
     
     const x = event.clientX;
     const y = event.clientY;
+
+    const dragWrapper = document.getElementById("wrapper-drag");
 
     const rect = dragWrapper.getBoundingClientRect();
     
@@ -43,8 +46,8 @@
 
   mainAnimation = new MainAnimation(loadedScene);
   assetsAnimation = new AssetsAnimation(loadedScene, mainAnimation.addMesh);
+  dragAnimation = new DragAnimation();
 
-  console.log(assetsAnimation);
   onMount(async () => {
     const canvasViewer: HTMLCanvasElement = document.getElementById(
       "canvas-viewer"
@@ -52,13 +55,17 @@
     const canvasAssets: HTMLCanvasElement = document.getElementById(
       "canvas-assets"
     ) as HTMLCanvasElement;
+    const canvasDrag: HTMLCanvasElement = document.getElementById(
+      "canvas-drag"
+    ) as HTMLCanvasElement;
     
     const wrapperViewer: HTMLElement = document.getElementById("wrapper-viewer");
     const wrapperAssets: HTMLElement = document.getElementById("wrapper-assets");
+    const dragWrapper = document.getElementById("wrapper-drag");
 
     mainAnimation.setElements(canvasViewer, wrapperViewer);
     assetsAnimation.setElements(canvasAssets, wrapperAssets);
-    
+    dragAnimation.setElements(canvasDrag, dragWrapper);
   });
 </script>
 
@@ -70,13 +77,12 @@
     <div id="wrapper-assets" class="assets" use:watchResize={resizeAssets}>
       <canvas id="canvas-assets" />
     </div>
-
-    <div id="assets-html" class="assets">
-      <Assets updateAssets={assetsAnimation.updateAssets}/>   
+    <div id="wrapper-drag" class="drag">
+      <canvas id="canvas-drag" />
     </div>
 
-    <div id="drag-wrapper" bind:this={dragWrapper}>
-      <Drag mesh={dragMesh} />
+    <div id="assets-html" class="assets">
+      <Assets updateAssets={assetsAnimation.updateAssets} startDrag={startDrag}/>   
     </div>
   </div>
 </main>
@@ -120,10 +126,13 @@
     background-color: rgb(214, 214, 214);
   }
 
-  #drag-wrapper {
+  #wrapper-drag {
     position: absolute;
+    width: 100px;
+    height: 100px;
     z-index: 10;
     background-color: red;
+    display: none;
 
   }
 
