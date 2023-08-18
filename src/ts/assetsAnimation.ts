@@ -47,14 +47,6 @@ export class AssetsAnimation extends ThreeAnimation {
         this.assetMeshes = [];
         this.raycaster = new Raycaster();
 
-        this.renderer.shadowMap.enabled = true;
-        this.renderer.shadowMap.type = VSMShadowMap; // 
-
-        this.renderer.setSize( window.innerWidth, window.innerHeight );
-        this.renderer.outputEncoding = sRGBEncoding;
-        this.renderer.toneMapping = ACESFilmicToneMapping;
-        this.renderer.toneMappingExposure = 0.40;
-        
         //this.camera.position.set(1, 1, 1);
 
         this.camera.position.set(0, 0, 10);

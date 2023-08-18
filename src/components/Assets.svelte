@@ -11,7 +11,7 @@
   for (let i = 0; i < nItems; i++) {
     assets.push(
       {
-        name : 'example',
+        name : 'Asset Name',
         path : 'alkd',
         focused : false,
         visible : true,
@@ -33,7 +33,7 @@
         const rect = item.getBoundingClientRect();
 
         const x = rect.left - rectHtml.left + rect.width / 2;
-		    const y = rect.top - rectHtml.top + rect.height / 2;
+		    const y = rect.top - rectHtml.top + rect.height / 2 + 10;
 
         assets[i].posX = (x / rectHtml.width) * 2 - 1;
         assets[i].posY = -(y / rectHtml.height) * 2 + 1;
@@ -81,6 +81,9 @@
 
   .assets {
     margin: 0;
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
+    user-select: none; /* Standard syntax */
   }
 
   .container {
@@ -96,20 +99,19 @@
     flex-basis: 130px;
     flex-grow: 1;
     height: 130px;
-    margin: 5px;
-    padding: 5px;
+    margin: 10px 0px;
     transition: 0.1s;
   }
 
   .item:hover {
-    
-    color: black;
+    text-decoration: solid underline;
     cursor: pointer;
   }
 
   p{
     margin: 2px;
     color: black;
+    text-align: center;
   }
 
   h2 {

@@ -1,4 +1,12 @@
-import { WebGLRenderer, PerspectiveCamera, Vector2, Scene, OrthographicCamera } from "three";
+import { 
+    WebGLRenderer, 
+    PerspectiveCamera, 
+    Vector2, 
+    Scene, 
+    VSMShadowMap,
+    sRGBEncoding,
+    ACESFilmicToneMapping,
+    OrthographicCamera } from "three";
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js';
 
 export abstract class ThreeAnimation {
@@ -105,6 +113,13 @@ export abstract class ThreeAnimation {
             }
         );
         this.renderer.setClearColor( 0x000000, 0 );
+
+        this.renderer.shadowMap.enabled = true;
+        this.renderer.shadowMap.type = VSMShadowMap; // 
+        this.renderer.outputEncoding = sRGBEncoding;
+        //this.renderer.toneMapping = ACESFilmicToneMapping;
+        this.renderer.toneMappingExposure = 0.40;
+
         this.scene = new Scene();
             
         if (!this.orthographicCamera)

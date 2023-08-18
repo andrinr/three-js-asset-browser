@@ -3,10 +3,14 @@
   import { watchResize } from "svelte-watch-resize";
   import { AssetsAnimation } from "./ts/assetsAnimation";
   import { MainAnimation } from "./ts/mainAnimation";
+  import { DragAnimation } from "./ts/dragAnimation";
   import Assets from "./components/Assets.svelte";
+  import Drag from "./components/Drag.svelte";
 
   let mainAnimation: MainAnimation;
   let assetsAnimation : AssetsAnimation;
+  let dragMesh : Mesh | undefined;
+  let dragWrapper : HTMLElement;
 
   const resizeViewer = (element: HTMLElement) => {
     if (mainAnimation) mainAnimation.resize(element);
@@ -14,6 +18,22 @@
 
   const resizeAssets = (element: HTMLElement) => {
     if (assetsAnimation) assetsAnimation.resize(element);
+  };
+
+  const dragCallback = (mesh) => {
+    dragMesh = mesh;
+  };
+
+  const onMouseMove = (event) => {
+    
+    const x = event.clientX;
+    const y = event.clientY;
+
+    const rect = dragWrapper.getBoundingClientRect();
+    
+    dragWrapper.style.left = `${x - rect.width / 2}px`;
+    dragWrapper.style.top = `${y - rect.height / 2}px`;
+    
   };
 
   const loadedScene = () => {
@@ -43,7 +63,7 @@
 </script>
 
 <main>
-  <div class="configurator">
+  <div class="configurator" on:mousemove={onMouseMove}>
     <div id="wrapper-viewer" class="viewer" use:watchResize={resizeViewer}>
       <canvas id="canvas-viewer" />
     </div>
@@ -55,6 +75,9 @@
       <Assets updateAssets={assetsAnimation.updateAssets}/>   
     </div>
 
+    <div id="drag-wrapper" bind:this={dragWrapper}>
+      <Drag mesh={dragMesh} />
+    </div>
   </div>
 </main>
 
@@ -95,6 +118,13 @@
     z-index: 2;
     overflow-y: scroll;
     background-color: rgb(214, 214, 214);
+  }
+
+  #drag-wrapper {
+    position: absolute;
+    z-index: 10;
+    background-color: red;
+
   }
 
   canvas {
