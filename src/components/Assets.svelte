@@ -1,5 +1,6 @@
 <script lang="ts">
   import type AssetInstance from "../ts/assetInstance";
+  import { watchResize } from "svelte-watch-resize";
   import Asset from "./Asset.svelte";
 
   let assets : AssetInstance[] = [];
@@ -12,16 +13,18 @@
       {
         name : 'example',
         path : 'alkd',
+        focused : false,
         visible : true,
         posX : 0,
         posY : 0,
       }
     )
-  }
+  };
 
-  const onScroll = (event: WheelEvent) => {
+  const update = () => {
+    console.log("update");
+
     const assetsHtml = document.getElementById("assets-html");
-
     const rectHtml = assetsHtml.getBoundingClientRect();
 
     for (let i = 0; i < nItems; i++) {
@@ -37,41 +40,80 @@
 
       }
     }
-
     updateAssets(assets);
   }
 
   let assetsHtml : HTMLElement;
 
 </script>
+
+<div class="assets">
+  <h2>Assets:</h2>
+  <br>
+  <div class="container" on:wheel={update} use:watchResize={update} bind:this={assetsHtml} >
   
-<div class="container" on:wheel={onScroll} bind:this={assetsHtml}>
-  {#each assets as asset, i}
-    <div class="item" id="item-{i}">
-      <p>{Asset.name}</p>
-    </div>
-  {/each}
+    {#each assets as asset, i}
+      <div 
+        class="item" 
+        id="item-{i}" 
+        on:mouseenter={
+          () => {
+            assets[i].focused = true;
+            updateAssets(assets);
+          }
+        }
+
+        on:mouseleave={
+          () => {
+            assets[i].focused = false;
+            updateAssets(assets);
+          }
+        }
+      >
+        <p>{asset.name}</p>
+      </div>
+    {/each}
+  </div>
 </div>
 
+
 <style>
+
+  .assets {
+    margin: 0;
+  }
 
   .container {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
+    margin: 10px;
   }
 
   .item {
-    width: 150px;
-    height: 150px;
-    margin: 10px;
-    border: dashed 1px black;
-    padding: margin;
+    flex-basis: 130px;
+    flex-grow: 1;
+    height: 130px;
+    margin: 5px;
+    padding: 5px;
+    transition: 0.1s;
+  }
+
+  .item:hover {
+    
+    color: black;
+    cursor: pointer;
   }
 
   p{
-    margin: 10px;
+    margin: 2px;
+    color: black;
+  }
+
+  h2 {
+    margin: 0;
+    color: black;
   }
 </style>

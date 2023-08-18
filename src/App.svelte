@@ -94,6 +94,7 @@
   #assets-html {
     z-index: 2;
     overflow-y: scroll;
+    background-color: rgb(214, 214, 214);
   }
 
   canvas {

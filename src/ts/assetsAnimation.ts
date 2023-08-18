@@ -10,7 +10,8 @@ import {
     Mesh,
     HemisphereLight,
     BoxGeometry,
-    MeshPhongMaterial} from 'three';
+    MeshPhongMaterial,
+    PointLight} from 'three';
 
 // Local imports
 import { ThreeAnimation } from "./animation";
@@ -26,6 +27,9 @@ export class AssetsAnimation extends ThreeAnimation {
 
     private raycaster : Raycaster;
     private selectedObject : Mesh;
+
+    private hemiLight : HemisphereLight;
+    private mouseLight : PointLight;
 
     public constructor(
         loadedCallback : () => void,
@@ -66,33 +70,6 @@ export class AssetsAnimation extends ThreeAnimation {
             //element.rotation.x += 0.01;
             element.rotation.y += 0.01;
         }
-
-        this.raycaster.setFromCamera( this.mousePosition, this.camera );
-        const intersects = this.raycaster.intersectObjects( this.assetMeshes );
-
-        if (intersects.length > 0) {
-            const intersect = intersects[0];
-            const object = intersect.object as Mesh;
-
-            if (object !== this.selectedObject && this.selectedObject !== undefined) {
-                this.unselect();
-            }
-
-            this.select(object);
-        }
-        else {
-            this.unselect();
-        }
-
-        if (this.click && this.selectedObject !== undefined) {
-            const geometry = this.selectedObject.geometry;
-            const material = new MeshPhongMaterial({color: 0xffffff});
-    
-            const clone = new Mesh( geometry.clone(), material );
-            this.addMeshCallback(clone);
-        }
-
-        //this.controls.update();
     }
 
     private select(mesh : Mesh) {
@@ -120,29 +97,33 @@ export class AssetsAnimation extends ThreeAnimation {
 
         console.log(assets);
         for (let i = 0; i < assets.length; i++) {
+
             const pos = new Vector2(assets[i].posX, assets[i].posY);
 
             this.raycaster.setFromCamera(pos, this.camera);
 
             const intersects = this.raycaster.intersectObject(this.floorPlane);
 
-            if (intersects.length > 0) {
+            if (assets[i].focused) {
+                this.assetMeshes[i].material.color.set(0xffff00);
+            }
+            else {
+                this.assetMeshes[i].material.color.set(0xffffff);
+            }
+            if (intersects.length > 0) {   
                 const intersect = intersects[0];
                 const point = intersect.point;
 
-                console.log(point);
 
-                const prevY = this.assetMeshes[i].position.y;
                 this.assetMeshes[i].position.set(point.x, point.y, point.z);
             }
         }
     }
 
 	private addLights() : void {
-        const hemiLight = new HemisphereLight( 0xffffff, 0xbbbbbb, 1.0 );
-        hemiLight.position.set( 0, 50, 0 );
-        this.scene.add( hemiLight );
-
+        this.hemiLight = new HemisphereLight( 0xffffff, 0x737373, 1.0 );
+        this.hemiLight.position.set( 0, 50, 0 );
+        this.scene.add( this.hemiLight );
 	}
 
 	private async addModels() : Promise<void> {
@@ -159,13 +140,14 @@ export class AssetsAnimation extends ThreeAnimation {
 
         for (let i = 0; i < 20; i++) {
 
-            let geometry : BoxGeometry | SphereGeometry = new BoxGeometry( 1, 1, 1 );
+            let geometry : BoxGeometry | SphereGeometry = new BoxGeometry( 0.5, 0.5, 0.5 );
             
             if (Math.random() > 0.5) {
                 geometry = new SphereGeometry(0.5, 5, 5);
             }
             const material = new MeshPhongMaterial( { color: 0xffffff } );
             const cube = new Mesh( geometry, material );
+            //cube.material.wireframe = true;
 
             cube.rotation.x = Math.PI / 4;
             this.scene.add( cube );
