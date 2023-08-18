@@ -10,6 +10,8 @@
   let assetsAnimation : AssetsAnimation;
   let dragAnimation : DragAnimation;
 
+  let dragging : boolean = false;
+
   const resizeViewer = (element: HTMLElement) => {
     if (mainAnimation) mainAnimation.resize(element);
   };
@@ -23,6 +25,18 @@
 
     const dragWrapper = document.getElementById("wrapper-drag");
     dragWrapper.style.display = "block";
+
+    dragging = true;
+  };
+
+  const endDrag = () => {
+    if (!dragging)
+      return;
+    
+    const dragWrapper = document.getElementById("wrapper-drag");
+    dragWrapper.style.display = "none";
+
+    dragging = false;
   };
 
   const onMouseMove = (event) => {
@@ -70,7 +84,7 @@
 </script>
 
 <main>
-  <div class="configurator" on:mousemove={onMouseMove}>
+  <div class="configurator" on:mousemove={onMouseMove} on:mouseup={endDrag}>
     <div id="wrapper-viewer" class="viewer" use:watchResize={resizeViewer}>
       <canvas id="canvas-viewer" />
     </div>

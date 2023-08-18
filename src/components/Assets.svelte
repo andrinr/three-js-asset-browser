@@ -81,9 +81,9 @@
             updateAssets(assets);
           }
         }
-        on:click={
+        on:mousedown={
           () => {
-            startDrag(assets[i].mesh);
+            startDrag(assets[i].mesh.clone());
           }
         }
       >
