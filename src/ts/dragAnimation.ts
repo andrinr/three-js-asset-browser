@@ -1,8 +1,7 @@
 // Three.js
 import { 
-    sRGBEncoding, 
-    ACESFilmicToneMapping, 
-    VSMShadowMap,
+    BoxGeometry,
+    MeshPhongMaterial,
     Mesh,
     HemisphereLight,} from 'three';
 
@@ -23,31 +22,29 @@ export class DragAnimation extends ThreeAnimation {
         this.camera.position.set(0, 0, 10);
         this.camera.zoom = 100;
 
-        this.addLights();
-        this.addModels(); 
+        this.addLights(); 
     }
 
     public setMesh(mesh: Mesh) : void {
         if (this.mesh != null)
             this.scene.remove(this.mesh);
         
+        console.log("Setting mesh");
         this.mesh = mesh;
+        this.mesh.position.set(0, 0, 0);
         this.scene.add(this.mesh);
     }
 
     public update(delta: number): void {
+        if (!this.mesh)
+            return;
 
+        this.mesh.rotation.y += 0.01;
     }
-
 
 	private addLights() : void {
         const hemiLight = new HemisphereLight( 0xffffff, 0x737373, 1.0 );
         hemiLight.position.set( 0, 50, 0 );
         this.scene.add( hemiLight );
-	}
-
-	private async addModels() : Promise<void> {
-
-
 	}
 }

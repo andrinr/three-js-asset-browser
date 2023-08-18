@@ -20,6 +20,10 @@
     if (assetsAnimation) assetsAnimation.resize(element);
   };
 
+  const resizeDrag = (element: HTMLElement) => {
+    if (dragAnimation) dragAnimation.resize(element);
+  };
+
   const startDrag = (mesh) => {
     if (dragAnimation) dragAnimation.setMesh(mesh);
 
@@ -32,7 +36,7 @@
   const endDrag = () => {
     if (!dragging)
       return;
-    
+
     const dragWrapper = document.getElementById("wrapper-drag");
     dragWrapper.style.display = "none";
 
@@ -75,7 +79,7 @@
     
     const wrapperViewer: HTMLElement = document.getElementById("wrapper-viewer");
     const wrapperAssets: HTMLElement = document.getElementById("wrapper-assets");
-    const dragWrapper = document.getElementById("wrapper-drag");
+    const dragWrapper : HTMLElement = document.getElementById("wrapper-drag");
 
     mainAnimation.setElements(canvasViewer, wrapperViewer);
     assetsAnimation.setElements(canvasAssets, wrapperAssets);
@@ -91,7 +95,7 @@
     <div id="wrapper-assets" class="assets" use:watchResize={resizeAssets}>
       <canvas id="canvas-assets" />
     </div>
-    <div id="wrapper-drag" class="drag">
+    <div id="wrapper-drag" class="drag" use:watchResize={resizeDrag}>
       <canvas id="canvas-drag" />
     </div>
 
@@ -145,9 +149,7 @@
     width: 100px;
     height: 100px;
     z-index: 10;
-    background-color: red;
     display: none;
-
   }
 
   canvas {

@@ -86,7 +86,6 @@ export class AssetsAnimation extends ThreeAnimation {
 
     public updateAssets(assets : AssetInstance[]) {
 
-        console.log(assets);
         for (let i = 0; i < assets.length; i++) {
 
             const id = assets[i].id;
@@ -101,9 +100,11 @@ export class AssetsAnimation extends ThreeAnimation {
             const intersects = this.raycaster.intersectObject(this.floorPlane);
 
             if (assets[i].focused) {
+                // @ts-ignore
                 this.assetMap.get(id).material.color.set(0xffff00);
             }
             else {
+                // @ts-ignore
                 this.assetMap.get(id).material.color.set(0xffffff);
             }
             if (intersects.length > 0) {   
