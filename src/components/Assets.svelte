@@ -31,11 +31,12 @@
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
+    overflow: scroll;
   }
 
   .item {
-    width: 100px;
-    height: 100px;
+    width: 150px;
+    height: 150px;
     margin: 10px;
     background-color: red;
   }

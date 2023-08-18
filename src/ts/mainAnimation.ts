@@ -226,7 +226,7 @@ export class MainAnimation extends ThreeAnimation {
         const planeNormal = new Vector3(0, 1, 0);
         const planeY = -1;
         const floor = new PlaneGeometry(2000, 2000, 8, 8);
-        const floorMesh = new Mesh(floor, new MeshPhongMaterial({color: 0xffffff}));
+        const floorMesh = new Mesh(floor, new MeshPhongMaterial({color: 0x999999}));
         this.floorPlane = floorMesh;
         floorMesh.position.set(0, planeY, 0);
         floorMesh.rotateX(-Math.PI / 2);

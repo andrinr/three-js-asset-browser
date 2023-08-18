@@ -6,6 +6,7 @@
 
   // @ts-ignore
   import { MainAnimation } from "./ts/mainAnimation";
+    import Assets from "./components/Assets.svelte";
 
   let main: MainAnimation;
   let assets : AssetsAnimation;
@@ -46,12 +47,17 @@
 
 <main>
   <div class="configurator">
-    <div id="wrapper-viewer" use:watchResize={resizeViewer}>
+    <div id="wrapper-viewer" class="viewer" use:watchResize={resizeViewer}>
       <canvas id="canvas-viewer" />
     </div>
-    <div id="wrapper-assets" use:watchResize={resizeAssets}>
+    <div id="wrapper-assets" class="assets" use:watchResize={resizeAssets}>
       <canvas id="canvas-assets" />
     </div>
+
+    <div id="assets-html" class="assets">
+      <Assets/>
+    </div>
+
   </div>
 </main>
 
@@ -60,26 +66,35 @@
 <style>
 
   .configurator {
-    display: flex;
-    flex-direction: row;
     width: 100vw;
     height: 100vh;
+    position: absolute;
+    top: 0;
+    left: 0;
   }
 
-  #wrapper-viewer {
-    width: 70vw;
+  .viewer {
+    position: absolute;
+    width: 70%;
+    height: 100%;
+    left: 0;
+    top: 0;
   }
 
-  #wrapper-assets {
-    width: 30vw;
-    border-left: solid black;
-    border-width: 3px;
+  .assets {
+    position: absolute;
+    width: 30%;
+    height: 100%;
+    right: 0;
+    top: 0;
+  }
+
+  #assets-html {
+    z-index: -10;
   }
 
   canvas {
     width: 100%;
     height: 100%;
   }
-
-
 </style>

@@ -106,8 +106,8 @@ export class AssetsAnimation extends ThreeAnimation {
     }
     
     public onScroll(event: WheelEvent): void {
-        event.preventDefault();
-        event.stopPropagation();
+        //event.preventDefault();
+        //event.stopPropagation();
 
         const delta = event.deltaY;
         this.camera.position.y += delta * 0.01;
