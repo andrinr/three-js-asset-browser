@@ -49,9 +49,9 @@ export class MainAnimation extends ThreeAnimation {
         this.raycaster = new Raycaster();0;
         
         this.controls.enableDamping = true;
-        this.controls.enablePan = false;
+        this.controls.enablePan = true;
         this.controls.enableZoom = true;
-        this.controls.enableRotate = false;
+        this.controls.enableRotate = true;
         // this.controls.screenSpacePanning = false;
         // this.controls.panSpeed = 0.5;
         // // auto rotation
@@ -192,6 +192,7 @@ export class MainAnimation extends ThreeAnimation {
         this.selectedObject = mesh;
         // @ts-ignore
         mesh.material.color.set(0xffff00);
+        this.controls.enabled = false;
     }
 
     private unselect() {
@@ -199,6 +200,7 @@ export class MainAnimation extends ThreeAnimation {
         // @ts-ignore
         this.selectedObject.material.color.set(0xffffff);
         this.selectedObject = undefined;
+        this.controls.enabled = true;
     }
     
 	private addSky () {
