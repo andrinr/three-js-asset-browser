@@ -154,6 +154,8 @@ export class MainAnimation extends ThreeAnimation {
             console.log(position);
 
             const meshClone = new Mesh(mesh.geometry.clone(), mesh.material.clone());
+            meshClone.castShadow = true;
+            meshClone.receiveShadow = true;
 
             if (this.dragMesh === mesh) {
                 this.dragMesh.position.set(position.x, 0, position.z);
@@ -213,7 +215,7 @@ export class MainAnimation extends ThreeAnimation {
 	}
 
 	private addLights() {
-		const light = new DirectionalLight( "#ffd1d1", 3.5 );
+		const light = new DirectionalLight( "#ffd1d1", 1.5 );
 	    light.position.multiplyScalar(0).add(this.sunPosition.clone().multiplyScalar(this.scale * 30));
 
 		light.castShadow = true;
