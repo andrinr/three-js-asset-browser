@@ -7,6 +7,7 @@
   import Assets from "./components/Assets.svelte";
   import { Vector2 } from "three";
   import { Mesh } from "three";
+  import ContextMenu from "./components/menu.svelte";
 
   let mainAnimation: MainAnimation;
   let assetsAnimation : AssetsAnimation;
@@ -14,6 +15,7 @@
 
   let dragging : boolean = false;
   let dragMesh : Mesh = null;
+  let mousePos : Vector2 = new Vector2(0, 0);
 
   const resizeViewer = (element: HTMLElement) => {
     if (mainAnimation) mainAnimation.resize(element);
@@ -46,7 +48,17 @@
 
     dragging = false;
     
-    mainAnimation.placePreview();
+    const wrapperViewer: HTMLElement = document.getElementById("wrapper-viewer");
+    const rectViewer = wrapperViewer.getBoundingClientRect();
+    const inside = 
+      rectViewer.left < mousePos.x
+      && mousePos.x < rectViewer.right && 
+      rectViewer.top < mousePos.y
+      && mousePos.y < rectViewer.bottom;
+
+    if (inside) {
+      mainAnimation.placePreview();
+    } 
 
     console.log("end drag");
   };
@@ -58,6 +70,8 @@
     
     const x = event.clientX;
     const y = event.clientY;
+
+    mousePos.set(x, y);
 
     const dragWrapper = document.getElementById("wrapper-drag");
 
@@ -74,6 +88,14 @@
       && x < rectViewer.right && 
       rectViewer.top < y 
       && y < rectViewer.bottom;
+
+    if (!inside) {
+      dragWrapper.style.display = "block";
+      mainAnimation.removePreview();
+    }
+    else {
+      dragWrapper.style.display = "none";
+    }
 
     if (inside && dragging) {
       const vec = mainAnimation.documentToCanvasPosition(new Vector2(x, y));
@@ -127,6 +149,8 @@
       <Assets updateAssets={assetsAnimation.updateAssets} startDrag={startDrag}/>   
     </div>
   </div>
+
+  <ContextMenu />
 </main>
 
 <svelte:window/>

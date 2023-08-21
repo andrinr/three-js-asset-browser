@@ -1,18 +1,10 @@
 // Three.js
 import { 
-    sRGBEncoding, 
-    ACESFilmicToneMapping, 
     Vector3,
     DirectionalLight, 
     AmbientLight,
     MathUtils,
-    VSMShadowMap,
     Mesh,
-    Shape,
-    DoubleSide,
-    ExtrudeGeometry,
-    ExtrudeGeometryOptions,
-    MeshBasicMaterial,
     HemisphereLight,
     Raycaster,
     Vector2,
@@ -151,8 +143,6 @@ export class MainAnimation extends ThreeAnimation {
 
             const position = intersection.point;
 
-            console.log(position);
-
             const meshClone = new Mesh(mesh.geometry.clone(), mesh.material.clone());
             meshClone.castShadow = true;
             meshClone.receiveShadow = true;
@@ -160,6 +150,7 @@ export class MainAnimation extends ThreeAnimation {
             if (this.dragMesh === mesh) {
                 this.dragMesh.position.set(position.x, 0, position.z);
                 this.dragMesh.material.color.set(0x00ff00);
+                this.dragMesh.material.opacity = 0.5;
             }
             else if (this.dragMesh !== undefined) {
                 this.scene.remove(this.dragMesh);
@@ -167,6 +158,7 @@ export class MainAnimation extends ThreeAnimation {
 
                 this.dragMesh.position.set(position.x, 0, position.z);
                 this.dragMesh.material.color.set(0x00ff00);
+                this.dragMesh.material.opacity = 0.5;
                 this.scene.add(this.dragMesh);
             }
             else {
@@ -174,8 +166,16 @@ export class MainAnimation extends ThreeAnimation {
 
                 this.dragMesh.position.set(position.x, 0, position.z);
                 this.dragMesh.material.color.set(0x00ff00);
+                this.dragMesh.material.opacity = 0.5;
                 this.scene.add(this.dragMesh);
             }
+        }
+    }
+
+    public removePreview() {
+        if (this.dragMesh !== undefined) {
+            this.scene.remove(this.dragMesh);
+            this.dragMesh = undefined;
         }
     }
 
