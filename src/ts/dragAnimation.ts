@@ -29,7 +29,6 @@ export class DragAnimation extends ThreeAnimation {
         if (this.mesh != null)
             this.scene.remove(this.mesh);
         
-        console.log("Setting mesh");
         this.mesh = mesh;
         this.mesh.position.set(0, 0, 0);
         this.scene.add(this.mesh);

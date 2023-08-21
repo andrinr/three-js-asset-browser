@@ -74,13 +74,16 @@ export abstract class ThreeAnimation {
 
     public abstract update(delta : number) : void;
 
-    public onMouseMove(event : MouseEvent) : void {
+    public documentToCanvasPosition(vec : Vector2) : Vector2 {
         const rect = this.canvas.getBoundingClientRect();
-		const x = event.clientX - rect.left;
-		const y = event.clientY - rect.top;
+        const canvasX = (vec.x - rect.left) / this.canvas.clientWidth * 2 - 1;
+        const canvasY = - (vec.y - rect.top) / this.canvas.clientHeight * 2 + 1;
 
-		this.mousePosition.x = ( x / this.canvas.clientWidth ) * 2 - 1;
-        this.mousePosition.y = - ( y / this.canvas.clientHeight ) * 2 + 1;
+        return new Vector2(canvasX, canvasY);
+    }
+
+    public onMouseMove(event : MouseEvent) : void {
+        this.mousePosition = this.documentToCanvasPosition(new Vector2(event.clientX, event.clientY));
     }
 
     public onMouseDown(event : MouseEvent) : void {

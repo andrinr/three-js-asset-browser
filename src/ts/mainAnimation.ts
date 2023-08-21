@@ -34,17 +34,13 @@ export class MainAnimation extends ThreeAnimation {
     private displayGui : boolean = false;
     private floorPlane : Mesh;
 
-    private mouseHasMoved : boolean = false;
     private loadedCallback : () => void;
     private gui : dat.GUI;
 
     private selectedObject : Mesh;
-
     private raycaster : Raycaster;
-
-    private mouseScreenPosition : Vector2 = new Vector2();
-
     private selectables : Mesh[];
+    private dragMesh : Mesh;
 
     public constructor(
         loadedCallback : () => void
@@ -146,6 +142,47 @@ export class MainAnimation extends ThreeAnimation {
         }
     }
 
+    public previewPlacement(mesh : Mesh, pos : Vector2) {
+        this.raycaster.setFromCamera( pos, this.camera );
+        const intersects = this.raycaster.intersectObject( this.floorPlane);
+
+        if (intersects.length > 0) {
+            const intersection = intersects[0];
+
+            const position = intersection.point;
+
+            console.log(position);
+
+            if (this.dragMesh === mesh) {
+                this.dragMesh.position.set(position.x, 0, position.z);
+                this.dragMesh.material.color.set(0x00ff00);
+            }
+            else if (this.dragMesh !== undefined) {
+                this.scene.remove(this.dragMesh);
+                this.dragMesh = mesh;
+
+                this.dragMesh.position.set(position.x, 0, position.z);
+                this.dragMesh.material.color.set(0x00ff00);
+                this.scene.add(this.dragMesh);
+            }
+            else {
+                this.dragMesh = mesh;
+
+                this.dragMesh.position.set(position.x, 0, position.z);
+                this.dragMesh.material.color.set(0x00ff00);
+                this.scene.add(this.dragMesh);
+            }
+        }
+    }
+
+    public placePreview() {
+        if (this.dragMesh !== undefined) {
+            this.dragMesh.material.color.set(0xffffff);
+            this.selectables.push(this.dragMesh);
+            this.dragMesh = undefined;
+        }
+    }
+
     private select(mesh : Mesh) {
         this.selectedObject = mesh;
         // @ts-ignore
@@ -192,18 +229,6 @@ export class MainAnimation extends ThreeAnimation {
         ambientLight.intensity = 0.3;
         
         const hemiLight = new HemisphereLight( "#4dc1ff", "#ffdca8", 0.4);
-
-        if (this.gui) {
-            
-            this.gui.add(light, 'intensity', 0,10,0.01).name("Sun Light");
-            this.gui.add(ambientLight, 'intensity', 0,5,0.01).name("Ambient Light");
-            this.gui.add(hemiLight, 'intensity', 0,5,0.01).name("Hemi Light");
-
-            this.gui.addColor(light, 'color').name("Sun Color");
-            this.gui.addColor(ambientLight, 'color').name("Ambient Color");
-            this.gui.addColor(hemiLight, 'color').name("Hemi Color Sky");
-            this.gui.addColor(hemiLight, 'groundColor').name("Hemi Color Ground");
-        }
 
         this.scene.add(hemiLight);
         this.scene.add(light);

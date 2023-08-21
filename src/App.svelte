@@ -5,12 +5,16 @@
   import { MainAnimation } from "./ts/mainAnimation";
   import { DragAnimation } from "./ts/dragAnimation";
   import Assets from "./components/Assets.svelte";
+  import { Vector2 } from "three";
+  import { Mesh } from "three";
 
   let mainAnimation: MainAnimation;
   let assetsAnimation : AssetsAnimation;
   let dragAnimation : DragAnimation;
 
   let dragging : boolean = false;
+  let placeMesh : boolean = false;
+  let dragMesh : Mesh = null;
 
   const resizeViewer = (element: HTMLElement) => {
     if (mainAnimation) mainAnimation.resize(element);
@@ -26,6 +30,7 @@
 
   const startDrag = (mesh) => {
     if (dragAnimation) dragAnimation.setMesh(mesh);
+    dragMesh = mesh;
 
     const dragWrapper = document.getElementById("wrapper-drag");
     dragWrapper.style.display = "block";
@@ -41,9 +46,13 @@
     dragWrapper.style.display = "none";
 
     dragging = false;
+    placeMesh = true;
   };
 
   const onMouseMove = (event) => {
+
+    if (!dragging)
+      return;
     
     const x = event.clientX;
     const y = event.clientY;
@@ -54,7 +63,20 @@
     
     dragWrapper.style.left = `${x - rect.width / 2}px`;
     dragWrapper.style.top = `${y - rect.height / 2}px`;
+
+    const wrapperViewer: HTMLElement = document.getElementById("wrapper-viewer");
+    const rectViewer = wrapperViewer.getBoundingClientRect();
     
+    const inside = rectViewer.left < x && x < rectViewer.right && rectViewer.top < y && y < rectViewer.bottom;
+    if (inside && dragging) {
+      const vec = mainAnimation.documentToCanvasPosition(new Vector2(x, y));
+      const meshClone = new Mesh(dragMesh.geometry.clone(), dragMesh.material.clone());
+      mainAnimation.previewPlacement(meshClone, vec);
+    }
+    if (inside && placeMesh) {
+      mainAnimation.placePreview();
+      placeMesh = false;
+    }
   };
 
   const loadedScene = () => {
