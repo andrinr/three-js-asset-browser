@@ -7,11 +7,9 @@ import {
     Mesh,
     HemisphereLight,
     Raycaster,
-    Vector2,
     DirectionalLightHelper,
     MeshPhongMaterial,
-    PlaneGeometry,
-    BoxGeometry} from 'three';
+    PlaneGeometry} from 'three';
 
 import { Sky } from 'three/examples/jsm/objects/Sky.js';
 // Local imports
@@ -27,20 +25,22 @@ export class MainAnimation extends ThreeAnimation {
     private floorPlane : Mesh;
 
     private loadedCallback : () => void;
+    private startDragCallback : (mesh : Mesh) => void;
     private gui : dat.GUI;
 
-    private selectedObject : Mesh;
     private raycaster : Raycaster;
     private selectables : Mesh[];
-    private dragMesh : Mesh;
+    private highlighted : Mesh;
+    private dragging : Mesh;
+    private dragMeshIsPreview : boolean = false;
 
     public constructor(
-        loadedCallback : () => void
+        loadedCallback : () => void,
+        startDragCallback : (mesh : Mesh) => void,
         ) {
         super(false, true);
         this.loadedCallback = loadedCallback;
-
-        this.addMesh = this.addMesh.bind(this);
+        this.startDragCallback = startDragCallback;
     }
 
     public init(): void {
@@ -65,8 +65,10 @@ export class MainAnimation extends ThreeAnimation {
 
         this.camera.position.set(0, 15, 10);
         this.camera.lookAt(new Vector3(0,0,0));
-        //this.controls.maxDistance = 30 * this.scale ;
-        //this.controls.minDistance = 3 * this.scale ;
+        this.controls.maxDistance = 30 * this.scale ;
+        this.controls.minDistance = 3 * this.scale ;
+        this.controls.maxPolarAngle = Math.PI / 2;
+        this.controls.minPolarAngle = Math.PI / 6;
     
         if (this.displayGui) this.gui = new dat.GUI();
 
@@ -88,38 +90,9 @@ export class MainAnimation extends ThreeAnimation {
         this.selectables = [];
     }
 
-    public addMesh(mesh : Mesh) {
-        mesh.castShadow = true;
-        mesh.receiveShadow = true;
-        mesh.translateX(Math.random() * 10);
-        this.scene.add(mesh);
-
-        this.selectables.push(mesh);
-    }
-
     public update(delta: number): void {
         this.raycaster.setFromCamera( this.mousePosition, this.camera );
-        const intersects = this.raycaster.intersectObjects( this.selectables);
-
-        if (intersects.length > 0) {
-            
-            const intersect = intersects[0];
-            const object = intersect.object as Mesh;
-
-            if (object !== this.selectedObject && this.selectedObject !== undefined) {
-                this.unselect();
-            }
-
-            this.select(object);
-
-            this.wrapper.style.cursor = 'grab';
-        }
-        else if (this.mouseDown == false) {
-            this.unselect();
-            this.wrapper.style.cursor = 'default';
-        }
-
-        if (this.mouseDown && !this.click && this.selectedObject !== undefined) {
+        if (this.dragging) {
             const intersections = this.raycaster.intersectObject(this.floorPlane);
 
             if (intersections.length > 0) {
@@ -127,79 +100,75 @@ export class MainAnimation extends ThreeAnimation {
 
                 const position = intersection.point;
 
-                const prevY = this.selectedObject.position.y;
+                const prevY = this.dragging.position.y;
+                this.dragging.position.set(position.x, prevY, position.z);
+            }
+        }
+        else {
+            const intersects = this.raycaster.intersectObjects( this.selectables);
 
-                this.selectedObject.position.set(position.x, prevY, position.z);
+            if (intersects.length > 0) {
+                const intersect = intersects[0];
+                const object = intersect.object as Mesh;
+
+                this.drag(object);
+
+                if (this.click) {
+                    this.startDragCallback(object);
+                }
             }
         }
     }
 
-    public previewPlacement(mesh : Mesh, pos : Vector2) {
-        this.raycaster.setFromCamera( pos, this.camera );
-        const intersects = this.raycaster.intersectObject( this.floorPlane);
+    public setPreview(mesh : Mesh) {
+        this.dragMeshIsPreview = true;
 
-        if (intersects.length > 0) {
-            const intersection = intersects[0];
+        this.drag(mesh);
 
-            const position = intersection.point;
-
-            const meshClone = new Mesh(mesh.geometry.clone(), mesh.material.clone());
-            meshClone.castShadow = true;
-            meshClone.receiveShadow = true;
-
-            if (this.dragMesh === mesh) {
-                this.dragMesh.position.set(position.x, 0, position.z);
-                this.dragMesh.material.color.set(0x00ff00);
-                this.dragMesh.material.opacity = 0.5;
-            }
-            else if (this.dragMesh !== undefined) {
-                this.scene.remove(this.dragMesh);
-                this.dragMesh = meshClone;
-
-                this.dragMesh.position.set(position.x, 0, position.z);
-                this.dragMesh.material.color.set(0x00ff00);
-                this.dragMesh.material.opacity = 0.5;
-                this.scene.add(this.dragMesh);
-            }
-            else {
-                this.dragMesh = meshClone;
-
-                this.dragMesh.position.set(position.x, 0, position.z);
-                this.dragMesh.material.color.set(0x00ff00);
-                this.dragMesh.material.opacity = 0.5;
-                this.scene.add(this.dragMesh);
-            }
-        }
     }
 
     public removePreview() {
-        if (this.dragMesh !== undefined) {
-            this.scene.remove(this.dragMesh);
-            this.dragMesh = undefined;
+        if (this.dragging !== undefined && this.dragMeshIsPreview) {
+            this.scene.remove(this.dragging);
+            this.dragging = undefined;
+            this.dragMeshIsPreview = false;
         }
     }
 
     public placePreview() {
         console.log("place");
-        if (this.dragMesh !== undefined) {
-            this.dragMesh.material.color.set(0xffffff);
-            this.selectables.push(this.dragMesh);
-            this.dragMesh = undefined;
+        if (this.dragging !== undefined) {
+            this.dragging.material.color.set(0xffffff);
+            this.selectables.push(this.dragging);
+            this.dragging = undefined;
         }
     }
 
-    private select(mesh : Mesh) {
-        this.selectedObject = mesh;
+    public highlight(mesh : Mesh) {
+        this.highlighted = mesh;
         // @ts-ignore
-        mesh.material.color.set(0xffff00);
-        this.controls.enabled = false;
+        mesh.material.color.set(0xff0000);
     }
 
-    private unselect() {
-        if (this.selectedObject === undefined) return;
+    public unhighlight() {
+        if (this.highlighted === undefined) return;
+
         // @ts-ignore
-        this.selectedObject.material.color.set(0xffffff);
-        this.selectedObject = undefined;
+        this.highlighted.material.color.set(0xffffff);
+        this.highlighted = undefined;
+    }
+
+    private drag(mesh : Mesh) {
+        this.dragging = mesh;
+        this.controls.enabled = false;
+
+        this.startDragCallback(mesh);
+    }
+
+    private drop() {
+        if (this.dragging === undefined) return;
+
+        this.dragging = undefined;
         this.controls.enabled = true;
     }
     

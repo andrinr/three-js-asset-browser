@@ -4,17 +4,19 @@
   import { AssetsAnimation } from "./ts/assetsAnimation";
   import { MainAnimation } from "./ts/mainAnimation";
   import { DragAnimation } from "./ts/dragAnimation";
-  import Assets from "./components/Assets.svelte";
   import { Vector2 } from "three";
   import { Mesh } from "three";
+
+  // local imports
+  import Assets from "./components/Assets.svelte";
   import ContextMenu from "./components/menu.svelte";
+  import {dragMesh} from "./stores";
 
   let mainAnimation: MainAnimation;
   let assetsAnimation : AssetsAnimation;
   let dragAnimation : DragAnimation;
 
   let dragging : boolean = false;
-  let dragMesh : Mesh = null;
   let mousePos : Vector2 = new Vector2(0, 0);
 
   const resizeViewer = (element: HTMLElement) => {
@@ -29,15 +31,18 @@
     if (dragAnimation) dragAnimation.resize(element);
   };
 
-  const startDrag = (mesh) => {
-    if (dragAnimation) dragAnimation.setMesh(mesh);
-    dragMesh = mesh;
-
-    const dragWrapper = document.getElementById("wrapper-drag");
-    dragWrapper.style.display = "block";
-
-    dragging = true;
-  };
+  onMount(() => {
+    dragMesh.subscribe((mesh) => {
+      if (mesh != undefined) {
+        const dragWrapper = document.getElementById("wrapper-drag");
+        dragWrapper.style.display = "block";
+      }
+      else {
+        const dragWrapper = document.getElementById("wrapper-drag");
+        dragWrapper.style.display = "none";
+      }
+    });
+  });
 
   const endDrag = () => {
     if (!dragging)
@@ -146,7 +151,7 @@
     </div>
 
     <div id="assets-html" class="assets">
-      <Assets updateAssets={assetsAnimation.updateAssets} startDrag={startDrag}/>   
+      <Assets/>   
     </div>
   </div>
 

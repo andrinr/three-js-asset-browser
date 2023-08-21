@@ -21,7 +21,7 @@ export abstract class ThreeAnimation {
     public camera : OrthographicCamera | PerspectiveCamera;
     public canvas : HTMLCanvasElement;
     public wrapper : HTMLElement;
-    protected scene : Scene;
+    public scene : Scene;
     protected controls : OrbitControls;
 
     protected mouseOnScreen : boolean = false;

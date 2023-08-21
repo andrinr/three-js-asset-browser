@@ -1,22 +1,17 @@
 // Three.js
 import { 
-    sRGBEncoding, 
-    ACESFilmicToneMapping, 
     PlaneGeometry, 
     Raycaster,
     Vector2,
-    SphereGeometry,
-    VSMShadowMap,
     Mesh,
     HemisphereLight,
-    BoxGeometry,
     MeshPhongMaterial,
     PointLight} from 'three';
 
 // Local imports
 import { ThreeAnimation } from "./animation";
 import type AssetInstance from './assetInstance';
-
+import { assets } from '../stores';
 
 export class AssetsAnimation extends ThreeAnimation {
 
@@ -40,12 +35,11 @@ export class AssetsAnimation extends ThreeAnimation {
         this.loadedCallback = loadedCallback;
         this.addMeshCallback = addMeshCallback;
 
-        this.updateAssets = this.updateAssets.bind(this);
+        this.updateAssets = this.updateAssets.bind(this);  
     }
 
     public init(): void {
    
-        this.assetMap = new Map<number, Mesh>();
         this.raycaster = new Raycaster();
 
         //this.camera.position.set(1, 1, 1);
@@ -55,6 +49,10 @@ export class AssetsAnimation extends ThreeAnimation {
 
         this.addLights();
         this.addModels(); 
+
+        this.assetMap = new Map<number, Mesh>();
+        assets.subscribe(this.updateAssets);
+
     }
 
     public update(delta: number): void {
@@ -85,7 +83,6 @@ export class AssetsAnimation extends ThreeAnimation {
     }
 
     public updateAssets(assets : AssetInstance[]) {
-
         for (let i = 0; i < assets.length; i++) {
 
             const id = assets[i].id;
@@ -95,8 +92,10 @@ export class AssetsAnimation extends ThreeAnimation {
                 this.assetMap.set(id, assets[i].mesh);
             }
 
-            const pos = new Vector2(assets[i].posX, assets[i].posY);
-            this.raycaster.setFromCamera(pos, this.camera);
+            let pos = new Vector2(assets[i].posX, assets[i].posY);
+            let relativePos = this.documentToCanvasPosition(pos);
+
+            this.raycaster.setFromCamera(relativePos, this.camera);
             const intersects = this.raycaster.intersectObject(this.floorPlane);
 
             if (assets[i].focused) {
@@ -107,7 +106,8 @@ export class AssetsAnimation extends ThreeAnimation {
                 // @ts-ignore
                 this.assetMap.get(id).material.color.set(0xffffff);
             }
-            if (intersects.length > 0) {   
+
+            if (intersects.length > 0) {  
                 const intersect = intersects[0];
                 const point = intersect.point;
 

@@ -1,11 +1,9 @@
 <script lang="ts">
-  import type AssetInstance from "../ts/assetInstance";
   import { watchResize } from "svelte-watch-resize";
   import { Mesh, BoxGeometry, MeshPhongMaterial, SphereGeometry } from "three";
 
-  let assets : AssetInstance[] = [];
-  export let updateAssets : (assets : AssetInstance[]) => void;
-  export let startDrag : (mesh : Mesh) => void;
+  // local imports
+  import { dragMesh, assets } from '../stores';
 
   const nItems = 20;
 
@@ -20,39 +18,38 @@
 
     mesh.rotateX(Math.PI / 4);
 
-    assets.push(
-      {
-        name : 'Asset Name',
-        mesh : mesh,
-        focused : false,
-        visible : true,
-        posX : 0,
-        posY : 0,
-        id : i
-      }
-    )
+    assets.update( items => {
+      items.push(
+        {
+          name : 'Asset Name',
+          mesh : mesh,
+          focused : false,
+          visible : true,
+          posX : 0,
+          posY : 0,
+          id : i
+        }
+      )
+      return items;
+    });
   };
 
   const update = () => {
-    console.log("update");
-
-    const assetsHtml = document.getElementById("assets-html");
-    const rectHtml = assetsHtml.getBoundingClientRect();
-
     for (let i = 0; i < nItems; i++) {
       const item = document.getElementById(`item-${i}`);
       if (item) {
         const rect = item.getBoundingClientRect();
 
-        const x = rect.left - rectHtml.left + rect.width / 2;
-		    const y = rect.top - rectHtml.top + rect.height / 2 + 10;
+        const x = rect.left + rect.width / 2;
+		    const y = rect.top + rect.height / 2 + 10;
 
-        assets[i].posX = (x / rectHtml.width) * 2 - 1;
-        assets[i].posY = -(y / rectHtml.height) * 2 + 1;
-
+        assets.update( items => {
+          items[i].posX = x;
+          items[i].posY = y;
+          return items;
+        });
       }
     }
-    updateAssets(assets);
   }
 
   let assetsHtml : HTMLElement;
@@ -64,26 +61,30 @@
   <br>
   <div class="container" on:wheel={update} use:watchResize={update} bind:this={assetsHtml} >
   
-    {#each assets as asset, i}
+    {#each $assets as asset, i}
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <div 
         class="item" 
         id="item-{i}" 
         on:mouseenter={
           () => {
-            assets[i].focused = true;
-            updateAssets(assets);
+            assets.update( items => {
+              items[i].focused = true;
+              return items;
+            });
           }
         }
         on:mouseleave={
           () => {
-            assets[i].focused = false;
-            updateAssets(assets);
+            assets.update( items => {
+              items[i].focused = false;
+              return items;
+            });
           }
         }
         on:mousedown={
           () => {
-            startDrag(assets[i].mesh.clone());
+            dragMesh.set(asset.mesh);
           }
         }
       >
