@@ -13,7 +13,6 @@
   let dragAnimation : DragAnimation;
 
   let dragging : boolean = false;
-  let placeMesh : boolean = false;
   let dragMesh : Mesh = null;
 
   const resizeViewer = (element: HTMLElement) => {
@@ -46,7 +45,10 @@
     dragWrapper.style.display = "none";
 
     dragging = false;
-    placeMesh = true;
+    
+    mainAnimation.placePreview();
+
+    console.log("end drag");
   };
 
   const onMouseMove = (event) => {
@@ -67,15 +69,15 @@
     const wrapperViewer: HTMLElement = document.getElementById("wrapper-viewer");
     const rectViewer = wrapperViewer.getBoundingClientRect();
     
-    const inside = rectViewer.left < x && x < rectViewer.right && rectViewer.top < y && y < rectViewer.bottom;
+    const inside = 
+      rectViewer.left < x 
+      && x < rectViewer.right && 
+      rectViewer.top < y 
+      && y < rectViewer.bottom;
+
     if (inside && dragging) {
       const vec = mainAnimation.documentToCanvasPosition(new Vector2(x, y));
-      const meshClone = new Mesh(dragMesh.geometry.clone(), dragMesh.material.clone());
-      mainAnimation.previewPlacement(meshClone, vec);
-    }
-    if (inside && placeMesh) {
-      mainAnimation.placePreview();
-      placeMesh = false;
+      mainAnimation.previewPlacement(dragMesh, vec);
     }
   };
 

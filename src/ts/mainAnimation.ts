@@ -153,20 +153,22 @@ export class MainAnimation extends ThreeAnimation {
 
             console.log(position);
 
+            const meshClone = new Mesh(mesh.geometry.clone(), mesh.material.clone());
+
             if (this.dragMesh === mesh) {
                 this.dragMesh.position.set(position.x, 0, position.z);
                 this.dragMesh.material.color.set(0x00ff00);
             }
             else if (this.dragMesh !== undefined) {
                 this.scene.remove(this.dragMesh);
-                this.dragMesh = mesh;
+                this.dragMesh = meshClone;
 
                 this.dragMesh.position.set(position.x, 0, position.z);
                 this.dragMesh.material.color.set(0x00ff00);
                 this.scene.add(this.dragMesh);
             }
             else {
-                this.dragMesh = mesh;
+                this.dragMesh = meshClone;
 
                 this.dragMesh.position.set(position.x, 0, position.z);
                 this.dragMesh.material.color.set(0x00ff00);
@@ -176,6 +178,7 @@ export class MainAnimation extends ThreeAnimation {
     }
 
     public placePreview() {
+        console.log("place");
         if (this.dragMesh !== undefined) {
             this.dragMesh.material.color.set(0xffffff);
             this.selectables.push(this.dragMesh);
