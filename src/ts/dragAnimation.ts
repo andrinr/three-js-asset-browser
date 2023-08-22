@@ -18,7 +18,7 @@ export class DragAnimation extends ThreeAnimation {
 
     public init(): void {
         dragMesh.subscribe((mesh) => {
-            if (mesh !== this.mesh) {
+            if (mesh && mesh !== this.mesh ) {
                 this.scene.remove(this.mesh);
                 this.mesh = deepClone(mesh);
                 this.mesh.rotateX(Math.PI / 4);

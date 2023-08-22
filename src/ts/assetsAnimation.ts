@@ -4,14 +4,15 @@ import {
     Raycaster,
     Vector2,
     Mesh,
+    Color,
     HemisphereLight,
-    MeshPhongMaterial,
-    PointLight} from 'three';
+    MeshPhongMaterial} from 'three';
 
 // Local imports
 import { ThreeAnimation } from "./animation";
 import type AssetInstance from './assetInstance';
 import { assets } from '../stores';
+import { setMeshColor } from './helpers';
 
 export class AssetsAnimation extends ThreeAnimation {
 
@@ -20,16 +21,12 @@ export class AssetsAnimation extends ThreeAnimation {
 
     private assetMap : Map<number, Mesh>;
 
-    private raycaster : Raycaster;
-    private selectedObject : Mesh;
-
     private hemiLight : HemisphereLight;
-    private mouseLight : PointLight;
 
     public constructor(
         loadedCallback : () => void,
         ) {
-        super(true, false);
+        super(true, false, false);
         this.loadedCallback = loadedCallback;
 
         this.updateAssets = this.updateAssets.bind(this);  
@@ -57,24 +54,8 @@ export class AssetsAnimation extends ThreeAnimation {
             value.rotation.y += 0.01;
         }
     }
-
-    private select(mesh : Mesh) {
-        this.selectedObject = mesh;
-        // @ts-ignore
-        mesh.material.color.set(0xffff00);
-    }
-
-    private unselect() {
-        if (this.selectedObject === undefined) return;
-        // @ts-ignore
-        this.selectedObject.material.color.set(0xffffff);
-        this.selectedObject = undefined;
-    }
     
     public onScroll(event: WheelEvent): void {
-        //event.preventDefault();
-        //event.stopPropagation();
-
         const delta = event.deltaY;
         this.camera.position.y += delta * 0.01;
     }
@@ -95,14 +76,11 @@ export class AssetsAnimation extends ThreeAnimation {
             this.raycaster.setFromCamera(relativePos, this.camera);
             const intersects = this.raycaster.intersectObject(this.floorPlane);
 
-            if (assets[i].focused) {
-                // @ts-ignore
-                this.assetMap.get(id).material.color.set(0xffff00);
-            }
-            else {
-                // @ts-ignore
-                this.assetMap.get(id).material.color.set(0xffffff);
-            }
+            if (assets[i].focused) 
+                this.select(this.assetMap.get(id));
+            else
+                this.unselect(this.assetMap.get(id));
+        
 
             if (intersects.length > 0) {  
                 const intersect = intersects[0];
@@ -120,7 +98,6 @@ export class AssetsAnimation extends ThreeAnimation {
 	}
 
 	private async addModels() : Promise<void> {
-
         const planeY = -1;
         const floor = new PlaneGeometry(2000, 2000, 8, 8);
         const floorMesh = new Mesh(floor, new MeshPhongMaterial({color: 0xff000}));

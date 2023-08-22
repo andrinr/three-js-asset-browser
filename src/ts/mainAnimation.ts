@@ -16,52 +16,33 @@ import { Sky } from 'three/examples/jsm/objects/Sky.js';
 // Local imports
 import { ThreeAnimation } from "./animation";
 import * as dat from 'lil-gui'
-import { loadGLTF } from './loader';
+import { dragMesh } from '../stores';
 import { setMeshColor } from './helpers';
 
 export class MainAnimation extends ThreeAnimation {
 
     private scale : number;
     private sunPosition : Vector3;
-    private displayGui : boolean = false;
     private floorPlane : Mesh;
 
     private loadedCallback : () => void;
-    private startDragCallback : (mesh : Mesh) => void;
-    private gui : dat.GUI;
 
-    private raycaster : Raycaster;
-    private selectables : Mesh[];
-    private highlighted : Mesh;
-    private dragging : Mesh;
-    private dragMeshIsPreview : boolean = false;
+    private localDragMesh : Mesh;
 
     public constructor(
         loadedCallback : () => void
         ) {
-        super(false, true);
+        super(false, true, true);
         this.loadedCallback = loadedCallback;
     }
 
     public init(): void {
         this.scale = 1;
 
-        this.raycaster = new Raycaster();0;
-        
         this.controls.enableDamping = true;
         this.controls.enablePan = true;
         this.controls.enableZoom = true;
         this.controls.enableRotate = true;
-        // this.controls.screenSpacePanning = false;
-        // this.controls.panSpeed = 0.5;
-        // // auto rotation
-        // this.controls.autoRotate = true;
-        // this.controls.autoRotateSpeed = 0.1;
-        // this.controls.mouseButtons = {
-        //     LEFT: MOUSE.ROTATE,
-        //     MIDDLE: MOUSE.DOLLY,
-        //     RIGHT: MOUSE.PAN
-        // }
 
         this.camera.position.set(0, 15, 10);
         this.camera.lookAt(new Vector3(0,0,0));
@@ -70,13 +51,6 @@ export class MainAnimation extends ThreeAnimation {
         this.controls.maxPolarAngle = Math.PI / 2;
         this.controls.minPolarAngle = Math.PI / 6;
     
-        if (this.displayGui) this.gui = new dat.GUI();
-
-        if (this.displayGui){
-            this.gui.add(this.camera.position, 'x', -10, 10).step(0.1);
-            this.gui.add(this.camera.position, 'y', -10, 10).step(0.1);
-            this.gui.add(this.camera.position, 'z', -10, 10).step(0.1);
-        }
         this.sunPosition = new Vector3(0, 0, 0);
         const phi : number = MathUtils.degToRad( 90 - 20 );
         const theta : number = MathUtils.degToRad( 50 );
@@ -87,12 +61,23 @@ export class MainAnimation extends ThreeAnimation {
         this.addSky();
         this.addModels(); 
 
+        dragMesh.subscribe((mesh) => {
+            if (mesh) {
+                this.localDragMesh = mesh;
+                this.scene.add(this.localDragMesh);
+            }
+            else {
+                this.scene.remove(this.localDragMesh);
+                this.localDragMesh = undefined;
+            }
+        });
+
         this.selectables = [];
     }
 
     public update(delta: number): void {
         this.raycaster.setFromCamera( this.mousePosition, this.camera );
-        if (this.dragging) {
+        if (this.localDragMesh) {
             const intersections = this.raycaster.intersectObject(this.floorPlane);
 
             if (intersections.length > 0) {
@@ -100,76 +85,21 @@ export class MainAnimation extends ThreeAnimation {
 
                 const position = intersection.point;
 
-                const prevY = this.dragging.position.y;
-                this.dragging.position.set(position.x, prevY, position.z);
+                const prevY = this.localDragMesh.position.y;
+                this.localDragMesh.position.set(position.x, prevY, position.z);
             }
         }
-        else {
-            const intersects = this.raycaster.intersectObjects( this.selectables);
+        
+        if (this.selectedMesh && this.click) {
+            dragMesh.set(this.selectedMesh);
+        }
 
-            if (intersects.length > 0) {
-                const intersect = intersects[0];
-                const object = intersect.object as Mesh;
-
-                this.drag(object);
-
-                if (this.click) {
-                    this.startDragCallback(object);
-                }
-            }
+        if (this.selectedMesh && !this.mouseDown) {
+            this.scene.add(this.selectedMesh);
+            this.selectedMesh = undefined;
         }
     }
 
-    public setPreview(mesh : Mesh) {
-        this.dragMeshIsPreview = true;
-
-        this.drag(mesh);
-
-    }
-
-    public removePreview() {
-        if (this.dragging !== undefined && this.dragMeshIsPreview) {
-            this.scene.remove(this.dragging);
-            this.dragging = undefined;
-            this.dragMeshIsPreview = false;
-        }
-    }
-
-    public placePreview() {
-        console.log("place");
-        if (this.dragging !== undefined) {
-            setMeshColor(this.dragging, new Color(0xffffff));
-            this.selectables.push(this.dragging);
-            this.dragging = undefined;
-        }
-    }
-
-    public highlight(mesh : Mesh) {
-        this.highlighted = mesh;
-        setMeshColor(mesh, new Color(0xffff00));
-    }
-
-    public unhighlight() {
-        if (this.highlighted === undefined) return;
-
-        setMeshColor(this.highlighted, new Color(0xffffff));
-        this.highlighted = undefined;
-    }
-
-    private drag(mesh : Mesh) {
-        this.dragging = mesh;
-        this.controls.enabled = false;
-
-        this.startDragCallback(mesh);
-    }
-
-    private drop() {
-        if (this.dragging === undefined) return;
-
-        this.dragging = undefined;
-        this.controls.enabled = true;
-    }
-    
 	private addSky () {
 		const sky : Sky = new Sky();
 		sky.scale.setScalar( 20 * this.scale / 0.03 );

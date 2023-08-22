@@ -50,6 +50,10 @@
     }
   }
 
+  const endDrag = () => {
+    dragMesh.set(undefined);
+  }
+
   const onMouseMove = (event) => {
 
     mousePos.set(event.clientX, event.clientY);
@@ -78,21 +82,23 @@
       if (mesh != undefined) {
         const dragWrapper = document.getElementById("wrapper-drag");
         dragWrapper.style.display = "block";
+        setCanvasDrag();
       }
       else {
         const dragWrapper = document.getElementById("wrapper-drag");
         dragWrapper.style.display = "none";
       }
     });
-
-    setCanvasDrag();
   });
-
 
 </script>
 
 <main>
-  <div class="configurator" on:mousemove={onMouseMove}>
+  <div 
+    class="configurator" 
+    on:mousemove={onMouseMove} 
+    on:mouseup={() => {dragMesh.set(undefined)}}>
+
     <div 
       id="wrapper-viewer" 
       class="viewer" 
