@@ -9,13 +9,15 @@ import {
     Raycaster,
     DirectionalLightHelper,
     MeshPhongMaterial,
-    PlaneGeometry} from 'three';
+    PlaneGeometry,
+    Color} from 'three';
 
 import { Sky } from 'three/examples/jsm/objects/Sky.js';
 // Local imports
 import { ThreeAnimation } from "./animation";
 import * as dat from 'lil-gui'
 import { loadGLTF } from './loader';
+import { setMeshColor } from './helpers';
 
 export class MainAnimation extends ThreeAnimation {
 
@@ -35,12 +37,10 @@ export class MainAnimation extends ThreeAnimation {
     private dragMeshIsPreview : boolean = false;
 
     public constructor(
-        loadedCallback : () => void,
-        startDragCallback : (mesh : Mesh) => void,
+        loadedCallback : () => void
         ) {
         super(false, true);
         this.loadedCallback = loadedCallback;
-        this.startDragCallback = startDragCallback;
     }
 
     public init(): void {
@@ -138,7 +138,7 @@ export class MainAnimation extends ThreeAnimation {
     public placePreview() {
         console.log("place");
         if (this.dragging !== undefined) {
-            this.dragging.material.color.set(0xffffff);
+            setMeshColor(this.dragging, new Color(0xffffff));
             this.selectables.push(this.dragging);
             this.dragging = undefined;
         }
@@ -146,15 +146,13 @@ export class MainAnimation extends ThreeAnimation {
 
     public highlight(mesh : Mesh) {
         this.highlighted = mesh;
-        // @ts-ignore
-        mesh.material.color.set(0xff0000);
+        setMeshColor(mesh, new Color(0xffff00));
     }
 
     public unhighlight() {
         if (this.highlighted === undefined) return;
 
-        // @ts-ignore
-        this.highlighted.material.color.set(0xffffff);
+        setMeshColor(this.highlighted, new Color(0xffffff));
         this.highlighted = undefined;
     }
 

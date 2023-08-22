@@ -16,7 +16,6 @@ import { assets } from '../stores';
 export class AssetsAnimation extends ThreeAnimation {
 
     private loadedCallback : () => void;
-    private addMeshCallback : (mesh : Mesh) => void;
     private floorPlane : Mesh;
 
     private assetMap : Map<number, Mesh>;
@@ -29,11 +28,9 @@ export class AssetsAnimation extends ThreeAnimation {
 
     public constructor(
         loadedCallback : () => void,
-        addMeshCallback : (mesh : Mesh) => void
         ) {
         super(true, false);
         this.loadedCallback = loadedCallback;
-        this.addMeshCallback = addMeshCallback;
 
         this.updateAssets = this.updateAssets.bind(this);  
     }

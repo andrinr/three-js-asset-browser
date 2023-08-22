@@ -1,13 +1,12 @@
 // Three.js
 import { 
-    BoxGeometry,
-    MeshPhongMaterial,
     Mesh,
     HemisphereLight,} from 'three';
 
 // Local imports
 import { ThreeAnimation } from "./animation";
 import { dragMesh } from '../stores';
+import { deepClone } from './helpers';
 
 export class DragAnimation extends ThreeAnimation {
 
@@ -18,12 +17,12 @@ export class DragAnimation extends ThreeAnimation {
     }
 
     public init(): void {
-        //this.camera.position.set(1, 1, 1);
         dragMesh.subscribe((mesh) => {
             if (mesh !== this.mesh) {
-                const clone = new Mesh(mesh.geometry.clone(), mesh.material.clone());
-                this.mesh = clone;
-                this.scene.add(clone);
+                this.scene.remove(this.mesh);
+                this.mesh = deepClone(mesh);
+                this.mesh.rotateX(Math.PI / 4);
+                this.scene.add(this.mesh);
             }
             else {
                 this.scene.remove(this.mesh);

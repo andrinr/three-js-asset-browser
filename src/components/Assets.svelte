@@ -62,7 +62,6 @@
   <div class="container" on:wheel={update} use:watchResize={update} bind:this={assetsHtml} >
   
     {#each $assets as asset, i}
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
       <div 
         class="item" 
         id="item-{i}" 
