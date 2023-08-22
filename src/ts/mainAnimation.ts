@@ -17,7 +17,7 @@ import { Sky } from 'three/examples/jsm/objects/Sky.js';
 import { ThreeAnimation } from "./animation";
 import * as dat from 'lil-gui'
 import { dragMesh } from '../stores';
-import { setMeshColor } from './helpers';
+import { deepClone, setMeshColor } from './helpers';
 
 export class MainAnimation extends ThreeAnimation {
 
@@ -63,11 +63,21 @@ export class MainAnimation extends ThreeAnimation {
 
         dragMesh.subscribe((mesh) => {
             if (mesh) {
-                this.localDragMesh = mesh;
+                this.localDragMesh = deepClone(mesh);
+                this.localDragMesh.castShadow = true;
+                this.localDragMesh.receiveShadow = true;
+                
                 this.scene.add(this.localDragMesh);
             }
             else {
-                this.scene.remove(this.localDragMesh);
+                if (this.mouseOnScreen) {
+                    this.scene.add(this.localDragMesh);
+                    console.log("end drag");	
+                }
+                else {
+                    this.scene.remove(this.localDragMesh);
+                }
+
                 this.localDragMesh = undefined;
             }
         });
@@ -95,8 +105,7 @@ export class MainAnimation extends ThreeAnimation {
         }
 
         if (this.selectedMesh && !this.mouseDown) {
-            this.scene.add(this.selectedMesh);
-            this.selectedMesh = undefined;
+            dragMesh.set(undefined);
         }
     }
 

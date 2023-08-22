@@ -43,15 +43,10 @@
 
     if (!inside) {
       dragWrapper.style.display = "block";
-      mainAnimation.removePreview();
     }
     else {
       dragWrapper.style.display = "none";
     }
-  }
-
-  const endDrag = () => {
-    dragMesh.set(undefined);
   }
 
   const onMouseMove = (event) => {
