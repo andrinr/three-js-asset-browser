@@ -68,16 +68,17 @@ export class MainAnimation extends ThreeAnimation {
                 this.localDragMesh.receiveShadow = true;
 
                 this.scene.add(this.localDragMesh);
+                this.controls.enabled = false;
             }
             else {
                 if (this.mouseOnScreen) {
-                    this.scene.add(this.localDragMesh);
-                    console.log("end drag");	
+                    this.unselect(this.localDragMesh);
+                    this.selectables.push(this.localDragMesh);
                 }
                 else {
                     this.scene.remove(this.localDragMesh);
                 }
-
+                this.controls.enabled = true;
                 this.localDragMesh = undefined;
             }
         });
@@ -105,6 +106,7 @@ export class MainAnimation extends ThreeAnimation {
         
         if (this.selectedMesh && this.click) {
             dragMesh.set(this.selectedMesh);
+            this.scene.remove(this.selectedMesh);
         }
 
         if (this.selectedMesh && !this.mouseDown) {

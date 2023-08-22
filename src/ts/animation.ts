@@ -145,17 +145,17 @@ export abstract class ThreeAnimation {
             const intersects = this.raycaster.intersectObjects( this.selectables );
 
             if (intersects.length > 0) {
+
                 const intersect = intersects[0];
                 const mesh = intersect.object as Mesh;
 
-                if (this.mouseDown) {
-                    this.selectedMesh = mesh;
-                    this.select(this.selectedMesh);
-                }
-                else{
-                    this.unselect(this.selectedMesh);
-                    this.selectedMesh = undefined;
-                }
+                
+                this.selectedMesh = mesh;
+                this.select(this.selectedMesh);
+            }
+            else {
+                this.unselect(this.selectedMesh);
+                this.selectedMesh = undefined;
             }
         }
 
