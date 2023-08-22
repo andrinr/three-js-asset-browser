@@ -66,7 +66,7 @@ export class MainAnimation extends ThreeAnimation {
                 this.localDragMesh = deepClone(mesh);
                 this.localDragMesh.castShadow = true;
                 this.localDragMesh.receiveShadow = true;
-                
+
                 this.scene.add(this.localDragMesh);
             }
             else {
@@ -87,7 +87,7 @@ export class MainAnimation extends ThreeAnimation {
 
     public update(delta: number): void {
         this.raycaster.setFromCamera( this.mousePosition, this.camera );
-        if (this.localDragMesh) {
+        if (this.localDragMesh && this.mouseOnScreen) {
             const intersections = this.raycaster.intersectObject(this.floorPlane);
 
             if (intersections.length > 0) {
@@ -98,6 +98,9 @@ export class MainAnimation extends ThreeAnimation {
                 const prevY = this.localDragMesh.position.y;
                 this.localDragMesh.position.set(position.x, prevY, position.z);
             }
+        }
+        else if (this.localDragMesh) {
+            this.localDragMesh.position.set(10000, 0, 0);
         }
         
         if (this.selectedMesh && this.click) {

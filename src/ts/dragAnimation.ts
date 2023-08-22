@@ -13,7 +13,7 @@ export class DragAnimation extends ThreeAnimation {
     private mesh : Mesh;
 
     public constructor() {
-        super(true, false);
+        super(true, false, false);
     }
 
     public init(): void {
