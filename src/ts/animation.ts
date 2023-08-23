@@ -177,6 +177,16 @@ export abstract class ThreeAnimation {
 
     public onMouseMove(event : MouseEvent) : void {
         this.mousePosition = this.documentToCanvasPosition(new Vector2(event.clientX, event.clientY));
+
+        if (this.mousePosition.x < -1 || 
+            this.mousePosition.x > 1 ||
+            this.mousePosition.y < -1 ||
+            this.mousePosition.y > 1) {
+            this.mouseOnScreen = false;
+        }
+        else {
+            this.mouseOnScreen = true;
+        }
     }
 
     public onMouseDown(event : MouseEvent) : void {
