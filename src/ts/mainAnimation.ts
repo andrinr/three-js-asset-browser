@@ -6,12 +6,15 @@ import {
     MathUtils,
     Matrix4,
     Mesh,
+    ExtrudeGeometry,
+    Box3,
     Shape,
     HemisphereLight,
     DirectionalLightHelper,
     MeshPhongMaterial,
     PlaneGeometry,
-    ShapeGeometry} from 'three';
+    ShapeGeometry,
+    Color} from 'three';
 
 import { Sky } from 'three/examples/jsm/objects/Sky.js';
 import { get } from 'svelte/store';
@@ -88,16 +91,24 @@ export class MainAnimation extends ThreeAnimation {
                     outline.lineTo(area.boundingBox.min.x, area.boundingBox.max.y);
                     outline.lineTo(area.boundingBox.min.x, area.boundingBox.min.y);
 
-                    const geometry = new ShapeGeometry(outline);
-                    const material = new MeshPhongMaterial({color: 0xff0000, side: 2});
+                    const extrudeSettings = {
+                        depth: -3,
+                        bevelEnabled: false
+                    };
+
+                    const geometry = new ExtrudeGeometry(outline, extrudeSettings);
+
+                    const material = new MeshPhongMaterial({color: 0x00ff00, side: 2});
+                    material.transparent = true;
+                    material.opacity = 0.2;
 
                     const mesh = new Mesh(geometry, material);
-
+    
                     const lookAt = new Matrix4().lookAt(new Vector3(0, 0, 0), area.normal, new Vector3(0, 1, 0));
 
                     mesh.applyMatrix4(lookAt);
 
-                    mesh.position.set(0, -0.99, 0);
+                    mesh.position.set(0, -0.95, 0);
 
                     this.scene.add(mesh);
                     this.areas.push(mesh);
@@ -151,6 +162,22 @@ export class MainAnimation extends ThreeAnimation {
                 const prevY = this.localDragMesh.position.y;
                 this.localDragMesh.position.set(position.x, prevY, position.z);
             }
+
+            const boundingBoxDrag = new Box3().setFromObject(this.localDragMesh);
+
+            for (let area of this.areas) {
+                const boundingBoxArea = new Box3().setFromObject(area);
+                if (!boundingBoxArea.intersectsBox(boundingBoxDrag)) {
+                    console.log("not intersect");
+                    setMeshColor(this.localDragMesh, new Color(0xff0000));
+                    return;
+                }
+                else {
+                    console.log("intersect");
+                    setMeshColor(this.localDragMesh, new Color(0x00ff00));
+                }
+            }
+
         }
         else if (this.localDragMesh) {
             this.localDragMesh.position.set(10000, 0, 0);

@@ -23,8 +23,8 @@
       name : 'floor',
       normal : new Vector3(0, 1, 0),
       boundingBox : {
-        min : new Vector2(-1, -1),
-        max : new Vector2(0.5, 0.2)
+        min : new Vector2(-5, -5),
+        max : new Vector2(5, 5)
       },
     }
 
