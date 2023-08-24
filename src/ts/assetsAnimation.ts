@@ -70,7 +70,7 @@ export class AssetsAnimation extends ThreeAnimation {
                 this.assetMap.set(id, assets[i].mesh);
             }
 
-            let pos = new Vector2(assets[i].position.x, assets[i].position.y);
+            let pos = new Vector2(assets[i].viewerPosition.x, assets[i].viewerPosition.y);
             let relativePos = this.documentToCanvasPosition(pos);
 
             this.raycaster.setFromCamera(relativePos, this.camera);

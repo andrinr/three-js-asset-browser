@@ -14,6 +14,6 @@ export interface AssetInstance {
     area : Area[];
     visible : boolean;
     focused : boolean;
-    position : Vector3;
+    viewerPosition : Vector2;
     id : number;
 }

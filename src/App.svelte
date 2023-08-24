@@ -53,7 +53,7 @@
 
     mousePos.set(event.clientX, event.clientY);
 
-    if ($dragID == undefined)
+    if ($dragID === -1)
       return;
 
     setCanvasDrag();
@@ -73,8 +73,8 @@
     assetsAnimation.setElements(canvasAssets, wrapperAssets);
     dragAnimation.setElements(canvasDrag, wrapperDrag);
 
-    dragID.subscribe((mesh) => {
-      if (mesh != undefined) {
+    dragID.subscribe((id) => {
+      if (id !== -1) {
         const dragWrapper = document.getElementById("wrapper-drag");
         dragWrapper.style.display = "block";
         setCanvasDrag();

@@ -7,11 +7,9 @@ import {
     Mesh,
     Shape,
     HemisphereLight,
-    Raycaster,
     DirectionalLightHelper,
     MeshPhongMaterial,
-    PlaneGeometry,
-    Color} from 'three';
+    PlaneGeometry} from 'three';
 
 import { Sky } from 'three/examples/jsm/objects/Sky.js';
 import { get } from 'svelte/store';
@@ -62,14 +60,19 @@ export class MainAnimation extends ThreeAnimation {
         this.addSky();
         this.addModels(); 
 
+        this.selectables = [];
+
         dragID.subscribe((id) => {
             if (id !== -1) {
-                console.log(id);
                 this.localDragMesh = deepClone(get(assets)[id].mesh);
+                this.localDragMesh.userData['assetID'] = id;
                 this.localDragMesh.castShadow = true;
                 this.localDragMesh.receiveShadow = true;
 
                 this.scene.add(this.localDragMesh);
+
+                this.setDragMeshPosition();
+                
                 this.controls.enabled = false;
 
                 const outline = new Shape();
@@ -87,18 +90,27 @@ export class MainAnimation extends ThreeAnimation {
                     this.selectables.push(this.localDragMesh);
                 }
                 else {
-                    console.log("removing");
                     this.scene.remove(this.localDragMesh);
                 }
                 this.controls.enabled = true;
                 this.localDragMesh = undefined;
             }
         });
-
-        this.selectables = [];
     }
 
     public update(delta: number): void {
+        this.setDragMeshPosition();
+        if (this.selectedMesh && this.click) {
+            dragID.set(this.selectedMesh.userData['assetID']);
+            this.scene.remove(this.selectedMesh);
+        }
+
+        if (this.selectedMesh && !this.mouseDown) {
+            dragID.set(-1);
+        }
+    }
+
+    private setDragMeshPosition() {
         this.raycaster.setFromCamera( this.mousePosition, this.camera );
         if (this.localDragMesh && this.mouseOnScreen) {
             const intersections = this.raycaster.intersectObject(this.floorPlane);
@@ -114,15 +126,6 @@ export class MainAnimation extends ThreeAnimation {
         }
         else if (this.localDragMesh) {
             this.localDragMesh.position.set(10000, 0, 0);
-        }
-        
-        if (this.selectedMesh && this.click) {
-            dragID.set(-1);
-            this.scene.remove(this.selectedMesh);
-        }
-
-        if (this.selectedMesh && !this.mouseDown) {
-            dragID.set(-1);
         }
     }
 

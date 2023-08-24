@@ -35,7 +35,7 @@
           area : [floor],
           focused : false,
           visible : true,
-          position : new Vector3(0, 0, 0),
+          viewerPosition : new Vector2(0, 0),
           id : i
         }
       )
@@ -53,8 +53,8 @@
 		    const y = rect.top + rect.height / 2 + 10;
 
         assets.update( assetsArray => {
-          assetsArray[i].position.x = x;
-          assetsArray[i].position.y = y;
+          assetsArray[i].viewerPosition.x = x;
+          assetsArray[i].viewerPosition.y = y;
           return assetsArray;
         });
       }
@@ -76,7 +76,6 @@
         id="item-{i}" 
         on:mouseenter={
           () => {
-            console.log(i);
             assets.update( items => {
               items[i].focused = true;
               return items;
@@ -94,7 +93,6 @@
         on:mousedown={
           () => {
             dragID.set(i);
-            console.log(dragID);
           }
         }
       >
