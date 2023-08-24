@@ -5,6 +5,7 @@ import {
     AmbientLight,
     MathUtils,
     Mesh,
+    Shape,
     HemisphereLight,
     Raycaster,
     DirectionalLightHelper,
@@ -13,9 +14,10 @@ import {
     Color} from 'three';
 
 import { Sky } from 'three/examples/jsm/objects/Sky.js';
+import { get } from 'svelte/store';
 // Local imports
 import { ThreeAnimation } from "./animation";
-import { dragMesh } from '../stores';
+import { dragID, assets } from '../stores';
 import { deepClone, setMeshColor } from './helpers';
 
 export class MainAnimation extends ThreeAnimation {
@@ -60,17 +62,26 @@ export class MainAnimation extends ThreeAnimation {
         this.addSky();
         this.addModels(); 
 
-        dragMesh.subscribe((mesh) => {
-            if (mesh) {
-                this.localDragMesh = deepClone(mesh);
+        dragID.subscribe((id) => {
+            if (id !== -1) {
+                console.log(id);
+                this.localDragMesh = deepClone(get(assets)[id].mesh);
                 this.localDragMesh.castShadow = true;
                 this.localDragMesh.receiveShadow = true;
 
                 this.scene.add(this.localDragMesh);
                 this.controls.enabled = false;
+
+                const outline = new Shape();
+
+                const size = 5;
+
+                outline.moveTo(size, size);
+                outline.lineTo(-size, size);
+                outline.lineTo(-size, -size);
+                outline.lineTo(size, -size);
             }
             else {
-                console.log(this.mouseOnScreen);
                 if (this.mouseOnScreen) {
                     this.unselect(this.localDragMesh);
                     this.selectables.push(this.localDragMesh);
@@ -106,15 +117,13 @@ export class MainAnimation extends ThreeAnimation {
         }
         
         if (this.selectedMesh && this.click) {
-            dragMesh.set(this.selectedMesh);
+            dragID.set(-1);
             this.scene.remove(this.selectedMesh);
         }
 
         if (this.selectedMesh && !this.mouseDown) {
-            dragMesh.set(undefined);
+            dragID.set(-1);
         }
-
-        console.log(this.mouseOnScreen);
     }
 
 	private addSky () {

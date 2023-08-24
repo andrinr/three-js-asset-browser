@@ -5,8 +5,9 @@ import {
 
 // Local imports
 import { ThreeAnimation } from "./animation";
-import { dragMesh } from '../stores';
+import { dragID, assets } from '../stores';
 import { deepClone } from './helpers';
+import { get } from 'svelte/store';
 
 export class DragAnimation extends ThreeAnimation {
 
@@ -17,10 +18,11 @@ export class DragAnimation extends ThreeAnimation {
     }
 
     public init(): void {
-        dragMesh.subscribe((mesh) => {
-            if (mesh && mesh !== this.mesh ) {
+        dragID.subscribe((id) => {
+            if (id !== -1 && get(assets)[id].mesh !== this.mesh ) {
+                console.log(id);
                 this.scene.remove(this.mesh);
-                this.mesh = deepClone(mesh);
+                this.mesh = deepClone(get(assets)[id].mesh);
                 this.mesh.rotateX(Math.PI / 4);
                 this.scene.add(this.mesh);
             }

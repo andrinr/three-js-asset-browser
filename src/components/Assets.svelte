@@ -1,32 +1,41 @@
 <script lang="ts">
   import { watchResize } from "svelte-watch-resize";
-  import { Mesh, BoxGeometry, MeshPhongMaterial, SphereGeometry } from "three";
+  import { Mesh, BoxGeometry, MeshPhongMaterial, SphereGeometry, Vector3, Vector2 } from "three";
 
   // local imports
-  import { dragMesh, assets } from '../stores';
+  import { dragID, assets } from '../stores';
+  import type { Area } from "../ts/assetInstance";
 
   const nItems = 20;
 
   for (let i = 0; i < nItems; i++) {
     let geometry : BoxGeometry | SphereGeometry = new BoxGeometry( 0.5, 0.5, 0.5 );
             
-    if (Math.random() > 0.5) {
-        geometry = new SphereGeometry(0.5, 5, 5);
-    }
+    if (Math.random() > 0.5)
+      geometry = new SphereGeometry(0.5, 5, 5);
+
     const material = new MeshPhongMaterial( { color: 0xffffff } );
     const mesh = new Mesh( geometry, material );
 
     mesh.rotateX(Math.PI / 4);
+
+    const floor : Area = {
+      name : 'floor',
+      boundingBox : {
+        min : new Vector3(-1, -1, -1),
+        max : new Vector3(0.5, -1, 0.2)
+      },
+    }
 
     assets.update( items => {
       items.push(
         {
           name : 'Asset Name',
           mesh : mesh,
+          area : [floor],
           focused : false,
           visible : true,
-          posX : 0,
-          posY : 0,
+          position : new Vector3(0, 0, 0),
           id : i
         }
       )
@@ -43,10 +52,10 @@
         const x = rect.left + rect.width / 2;
 		    const y = rect.top + rect.height / 2 + 10;
 
-        assets.update( items => {
-          items[i].posX = x;
-          items[i].posY = y;
-          return items;
+        assets.update( assetsArray => {
+          assetsArray[i].position.x = x;
+          assetsArray[i].position.y = y;
+          return assetsArray;
         });
       }
     }
@@ -67,6 +76,7 @@
         id="item-{i}" 
         on:mouseenter={
           () => {
+            console.log(i);
             assets.update( items => {
               items[i].focused = true;
               return items;
@@ -83,7 +93,8 @@
         }
         on:mousedown={
           () => {
-            dragMesh.set(asset.mesh);
+            dragID.set(i);
+            console.log(dragID);
           }
         }
       >
@@ -93,9 +104,7 @@
   </div>
 </div>
 
-
 <style>
-
   .assets {
     margin: 0;
     -webkit-user-select: none; /* Safari */

@@ -1,11 +1,19 @@
-import type { Mesh } from 'three';
+import type { Mesh, Vector3, Vector2 } from 'three';
+
+export interface Area {
+    name : string;
+    boundingBox : {
+        min : Vector3;
+        max : Vector3;
+    };
+}
     
-export default interface AssetInstance {
+export interface AssetInstance {
     name : string;
     mesh : Mesh;
+    area : Area[];
     visible : boolean;
     focused : boolean;
-    posX : number;
-    posY : number;
+    position : Vector3;
     id : number;
 }

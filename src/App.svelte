@@ -6,7 +6,7 @@
   // local imports
   import Assets from "./components/Assets.svelte";
   import ContextMenu from "./components/menu.svelte";
-  import {dragMesh} from "./stores";
+  import {dragID} from "./stores";
   import { AssetsAnimation } from "./ts/assetsAnimation";
   import { MainAnimation } from "./ts/mainAnimation";
   import { DragAnimation } from "./ts/dragAnimation";
@@ -53,7 +53,7 @@
 
     mousePos.set(event.clientX, event.clientY);
 
-    if ($dragMesh == undefined)
+    if ($dragID == undefined)
       return;
 
     setCanvasDrag();
@@ -73,7 +73,7 @@
     assetsAnimation.setElements(canvasAssets, wrapperAssets);
     dragAnimation.setElements(canvasDrag, wrapperDrag);
 
-    dragMesh.subscribe((mesh) => {
+    dragID.subscribe((mesh) => {
       if (mesh != undefined) {
         const dragWrapper = document.getElementById("wrapper-drag");
         dragWrapper.style.display = "block";
@@ -92,7 +92,7 @@
   <div 
     class="configurator" 
     on:mousemove={onMouseMove} 
-    on:mouseup={() => {dragMesh.set(undefined)}}>
+    on:mouseup={() => {dragID.set(-1)}}>
 
     <div 
       id="wrapper-viewer" 
@@ -111,6 +111,7 @@
     >
       <canvas id="canvas-assets" bind:this={canvasAssets}/>
     </div>
+    
     <div 
       id="wrapper-drag" 
       class="drag" 

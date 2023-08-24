@@ -10,7 +10,7 @@ import {
 
 // Local imports
 import { ThreeAnimation } from "./animation";
-import type AssetInstance from './assetInstance';
+import type {AssetInstance} from './assetInstance';
 import { assets } from '../stores';
 import { setMeshColor } from './helpers';
 
@@ -70,7 +70,7 @@ export class AssetsAnimation extends ThreeAnimation {
                 this.assetMap.set(id, assets[i].mesh);
             }
 
-            let pos = new Vector2(assets[i].posX, assets[i].posY);
+            let pos = new Vector2(assets[i].position.x, assets[i].position.y);
             let relativePos = this.documentToCanvasPosition(pos);
 
             this.raycaster.setFromCamera(relativePos, this.camera);
