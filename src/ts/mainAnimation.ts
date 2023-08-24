@@ -32,6 +32,8 @@ export class MainAnimation extends ThreeAnimation {
     private loadedCallback : () => void;
 
     private localDragMesh : Mesh;
+    private dragPreviousPosition : Vector3;
+    private dragValid : boolean;
     private areas : Mesh[];
 
     public constructor(
@@ -68,6 +70,8 @@ export class MainAnimation extends ThreeAnimation {
 
         this.selectables = [];
         this.areas = [];
+
+        this.dragValid = false;
 
         dragID.subscribe((id) => {
             if (id !== -1) {
@@ -119,6 +123,10 @@ export class MainAnimation extends ThreeAnimation {
                 if (this.mouseOnScreen) {
                     this.unselect(this.localDragMesh);
                     this.selectables.push(this.localDragMesh);
+
+                    if (!this.dragValid) {
+                        this.localDragMesh.position.set(this.dragPreviousPosition.x, this.dragPreviousPosition.y, this.dragPreviousPosition.z);
+                    }
                 }
                 else {
                     this.scene.remove(this.localDragMesh);
@@ -137,11 +145,8 @@ export class MainAnimation extends ThreeAnimation {
         this.setDragMeshPosition();
         if (this.selectedMesh && this.click) {
             this.scene.remove(this.selectedMesh);
-            console.log(this.scene.children);
             dragID.set(this.selectedMesh.userData['assetID']);
-            console.log(this.scene.children);
-            console.log("select mesh to dragging");
-            console.log(this.selectedMesh);
+            this.dragPreviousPosition = this.selectedMesh.position.clone();
         }
 
         if (this.selectedMesh && !this.mouseDown) {
@@ -170,11 +175,13 @@ export class MainAnimation extends ThreeAnimation {
                 if (!boundingBoxArea.intersectsBox(boundingBoxDrag)) {
                     console.log("not intersect");
                     setMeshColor(this.localDragMesh, new Color(0xff0000));
+                    this.dragValid = false;
                     return;
                 }
                 else {
                     console.log("intersect");
                     setMeshColor(this.localDragMesh, new Color(0x00ff00));
+                    this.dragValid = true;
                 }
             }
 
