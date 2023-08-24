@@ -4,12 +4,14 @@ import {
     DirectionalLight, 
     AmbientLight,
     MathUtils,
+    Matrix4,
     Mesh,
     Shape,
     HemisphereLight,
     DirectionalLightHelper,
     MeshPhongMaterial,
-    PlaneGeometry} from 'three';
+    PlaneGeometry,
+    ShapeGeometry} from 'three';
 
 import { Sky } from 'three/examples/jsm/objects/Sky.js';
 import { get } from 'svelte/store';
@@ -27,6 +29,7 @@ export class MainAnimation extends ThreeAnimation {
     private loadedCallback : () => void;
 
     private localDragMesh : Mesh;
+    private areas : Mesh[];
 
     public constructor(
         loadedCallback : () => void
@@ -61,10 +64,12 @@ export class MainAnimation extends ThreeAnimation {
         this.addModels(); 
 
         this.selectables = [];
+        this.areas = [];
 
         dragID.subscribe((id) => {
             if (id !== -1) {
-                this.localDragMesh = deepClone(get(assets)[id].mesh);
+                const asset = get(assets)[id];
+                this.localDragMesh = deepClone(asset.mesh);
                 this.localDragMesh.userData['assetID'] = id;
                 this.localDragMesh.castShadow = true;
                 this.localDragMesh.receiveShadow = true;
@@ -72,17 +77,32 @@ export class MainAnimation extends ThreeAnimation {
                 this.scene.add(this.localDragMesh);
 
                 this.setDragMeshPosition();
-                
+
                 this.controls.enabled = false;
 
-                const outline = new Shape();
+                for (let area of asset.areas) {
+                    const outline = new Shape();
+                    outline.moveTo(area.boundingBox.min.x, area.boundingBox.min.y);
+                    outline.lineTo(area.boundingBox.max.x, area.boundingBox.min.y);
+                    outline.lineTo(area.boundingBox.max.x, area.boundingBox.max.y);
+                    outline.lineTo(area.boundingBox.min.x, area.boundingBox.max.y);
+                    outline.lineTo(area.boundingBox.min.x, area.boundingBox.min.y);
 
-                const size = 5;
+                    const geometry = new ShapeGeometry(outline);
+                    const material = new MeshPhongMaterial({color: 0xff0000, side: 2});
 
-                outline.moveTo(size, size);
-                outline.lineTo(-size, size);
-                outline.lineTo(-size, -size);
-                outline.lineTo(size, -size);
+                    const mesh = new Mesh(geometry, material);
+
+                    const lookAt = new Matrix4().lookAt(new Vector3(0, 0, 0), area.normal, new Vector3(0, 1, 0));
+
+                    mesh.applyMatrix4(lookAt);
+
+                    mesh.position.set(0, -0.99, 0);
+
+                    this.scene.add(mesh);
+                    this.areas.push(mesh);
+
+                }
             }
             else {
                 if (this.mouseOnScreen) {
@@ -94,6 +114,10 @@ export class MainAnimation extends ThreeAnimation {
                 }
                 this.controls.enabled = true;
                 this.localDragMesh = undefined;
+
+                for (let area of this.areas) {
+                    this.scene.remove(area);
+                }
             }
         });
     }
@@ -101,8 +125,12 @@ export class MainAnimation extends ThreeAnimation {
     public update(delta: number): void {
         this.setDragMeshPosition();
         if (this.selectedMesh && this.click) {
-            dragID.set(this.selectedMesh.userData['assetID']);
             this.scene.remove(this.selectedMesh);
+            console.log(this.scene.children);
+            dragID.set(this.selectedMesh.userData['assetID']);
+            console.log(this.scene.children);
+            console.log("select mesh to dragging");
+            console.log(this.selectedMesh);
         }
 
         if (this.selectedMesh && !this.mouseDown) {
@@ -181,33 +209,6 @@ export class MainAnimation extends ThreeAnimation {
         this.scene.add(floorMesh);
 
         //  loadGLTF('./models/model4.gltf', this.scene);
-
-        // const outline = new Shape();
-
-        // const size = 5;
-
-        // outline.moveTo(size, size);
-        // outline.lineTo(-size, size);
-        // outline.lineTo(-size, -size);
-        // outline.lineTo(size, -size);
-
-        // const extrudeSettings : ExtrudeGeometryOptions = {
-        //     steps: 2,
-        //     depth: 16,
-        //     bevelEnabled: false,
-        // };
-        
-        // const geometry = new ExtrudeGeometry( outline, extrudeSettings );
-        // const material = new MeshBasicMaterial( { color: 0x00ff00 } );
-
-        // material.side = DoubleSide;
-
-        // const mesh = new Mesh(geometry, material);
-        // mesh.position.set(0, -3, 0);
-        
-        // mesh.rotateX(-Math.PI / 2);
-
-        // this.scene.add(mesh);
 
         setTimeout(() => {
             this.loadedCallback();

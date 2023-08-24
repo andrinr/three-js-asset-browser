@@ -21,9 +21,10 @@
 
     const floor : Area = {
       name : 'floor',
+      normal : new Vector3(0, 1, 0),
       boundingBox : {
-        min : new Vector3(-1, -1, -1),
-        max : new Vector3(0.5, -1, 0.2)
+        min : new Vector2(-1, -1),
+        max : new Vector2(0.5, 0.2)
       },
     }
 
@@ -32,7 +33,7 @@
         {
           name : 'Asset Name',
           mesh : mesh,
-          area : [floor],
+          areas : [floor],
           focused : false,
           visible : true,
           viewerPosition : new Vector2(0, 0),
