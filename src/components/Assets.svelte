@@ -135,12 +135,11 @@
 
   p{
     margin: 2px;
-    color: black;
     text-align: center;
   }
 
   h2 {
-    margin: 0;
-    color: black;
+    margin: 1rem;
+    text-align: center;
   }
 </style>

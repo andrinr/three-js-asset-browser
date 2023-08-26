@@ -225,7 +225,7 @@ export class MainAnimation extends ThreeAnimation {
 	}
 
 	private addLights() {
-		const light = new DirectionalLight( "#ffd1d1", 1.5 );
+		const light = new DirectionalLight( "0xffffff", 1.5 );
 	    light.position.multiplyScalar(0).add(this.sunPosition.clone().multiplyScalar(this.scale * 30));
 
 		light.castShadow = true;
@@ -240,22 +240,21 @@ export class MainAnimation extends ThreeAnimation {
         const helper = new DirectionalLightHelper( light, 5 );
         this.scene.add( helper );
 
-		const ambientLight = new AmbientLight( "0xa68195");
+		const ambientLight = new AmbientLight( "0xffffff");
         ambientLight.intensity = 0.3;
         
-        const hemiLight = new HemisphereLight( "#4dc1ff", "#ffdca8", 0.4);
+        const hemiLight = new HemisphereLight( "0xffffff", "0xffffff", 0.4);
 
-        this.scene.add(hemiLight);
         this.scene.add(light);
-        this.scene.add(light);
-		this.scene.add(ambientLight);
+        // this.scene.add(hemiLight);
+		// this.scene.add(ambientLight);
 	}
 
 	private async addModels() {
 
         const planeY = -1;
         const floor = new PlaneGeometry(2000, 2000, 8, 8);
-        const floorMesh = new Mesh(floor, new MeshPhongMaterial({color: 0x999999}));
+        const floorMesh = new Mesh(floor, new MeshPhongMaterial({color: 0x6e6e6e}));
         this.floorPlane = floorMesh;
         floorMesh.position.set(0, planeY, 0);
         floorMesh.rotateX(-Math.PI / 2);

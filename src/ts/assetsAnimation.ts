@@ -57,7 +57,7 @@ export class AssetsAnimation extends ThreeAnimation {
     
     public onScroll(event: WheelEvent): void {
         const delta = event.deltaY;
-        this.camera.position.y += delta * 0.01;
+        this.camera.position.y += delta * 0.002;
     }
 
     public updateAssets(assets : AssetInstance[]) {
