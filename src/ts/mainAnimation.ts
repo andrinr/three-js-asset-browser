@@ -8,26 +8,31 @@ import {
     Mesh,
     ExtrudeGeometry,
     Box3,
+    BackSide,
+    DoubleSide,
     Shape,
     HemisphereLight,
     DirectionalLightHelper,
     MeshPhongMaterial,
     PlaneGeometry,
     ShapeGeometry,
-    Color} from 'three';
+    Color,
+    FrontSide} from 'three';
 
 import { Sky } from 'three/examples/jsm/objects/Sky.js';
 import { get } from 'svelte/store';
 // Local imports
 import { ThreeAnimation } from "./animation";
 import { dragID, assets } from '../stores';
-import { deepClone, setMeshColor } from './helpers';
+import { deepClone, setMeshColor, loadGLTF } from './helpers';
+
 
 export class MainAnimation extends ThreeAnimation {
 
     private scale : number;
     private sunPosition : Vector3;
     private floorPlane : Mesh;
+    private intersectionPlane : Mesh;
 
     private loadedCallback : () => void;
 
@@ -102,20 +107,35 @@ export class MainAnimation extends ThreeAnimation {
 
                     const geometry = new ExtrudeGeometry(outline, extrudeSettings);
 
-                    const material = new MeshPhongMaterial({color: 0x00ff00, side: 2});
-                    material.transparent = true;
-                    material.opacity = 0.2;
+                    const materialFront = new MeshPhongMaterial({
+                        color: 0xb0fffa,
+                        transparent: true,
+                        opacity: 0.2,
+                        side: FrontSide});
 
-                    const mesh = new Mesh(geometry, material);
-    
+                    const meshFront = new Mesh(geometry, materialFront);
+
+                    const materialBack = new MeshPhongMaterial({
+                        color: 0xb0fffa, 
+                        transparent: true,
+                        opacity: 0.2,
+                        side: BackSide});
+
+                    const meshBack = new Mesh(geometry, materialBack);
+
                     const lookAt = new Matrix4().lookAt(new Vector3(0, 0, 0), area.normal, new Vector3(0, 1, 0));
 
-                    mesh.applyMatrix4(lookAt);
+                    meshFront.applyMatrix4(lookAt);
+                    meshFront.position.set(0, -2, 0);
 
-                    mesh.position.set(0, -0.95, 0);
+                    meshBack.applyMatrix4(lookAt);
+                    meshBack.position.set(0, -2, 0);
 
-                    this.scene.add(mesh);
-                    this.areas.push(mesh);
+                    this.scene.add(meshFront);
+                    this.areas.push(meshFront);
+
+                    this.scene.add(meshBack);
+                    this.areas.push(meshBack);
 
                 }
             }
@@ -157,7 +177,7 @@ export class MainAnimation extends ThreeAnimation {
     private setDragMeshPosition() {
         this.raycaster.setFromCamera( this.mousePosition, this.camera );
         if (this.localDragMesh && this.mouseOnScreen) {
-            const intersections = this.raycaster.intersectObject(this.floorPlane);
+            const intersections = this.raycaster.intersectObject(this.intersectionPlane);
 
             if (intersections.length > 0) {
                 const intersection = intersections[0];
@@ -180,7 +200,7 @@ export class MainAnimation extends ThreeAnimation {
                 }
                 else {
                     console.log("intersect");
-                    setMeshColor(this.localDragMesh, new Color(0x00ff00));
+                    setMeshColor(this.localDragMesh, new Color(0xffffff));
                     this.dragValid = true;
                 }
             }
@@ -242,7 +262,16 @@ export class MainAnimation extends ThreeAnimation {
         floorMesh.receiveShadow = true;
         this.scene.add(floorMesh);
 
-        //  loadGLTF('./models/model4.gltf', this.scene);
+        this.intersectionPlane = new Mesh(new PlaneGeometry(2000, 2000, 8, 8), new MeshPhongMaterial({color: 0x999999}));
+        this.intersectionPlane.position.set(0, 0, 0);
+        this.intersectionPlane.rotateX(-Math.PI / 2);
+        this.intersectionPlane.visible = false;
+        this.scene.add(this.intersectionPlane);
+
+        // const model = await loadGLTF('./models/model5.gltf');
+
+        // this.scene.add(model);
+        // model.scale.setScalar(0.1);
 
         setTimeout(() => {
             this.loadedCallback();

@@ -8,9 +8,11 @@ import {
     Scene, 
     VSMShadowMap,
     sRGBEncoding,
-    OrthographicCamera } from "three";
+    OrthographicCamera} from "three";
+    
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js';
 import { setMeshColor } from "./helpers";
+import { EffectComposer } from "postprocessing";
 
 export abstract class ThreeAnimation {
     
@@ -36,16 +38,20 @@ export abstract class ThreeAnimation {
     protected orthographicMode : boolean;
     protected orbitMode : boolean;
     protected selectionMode : boolean;
+    protected posProcessingMode : boolean;
 
     protected selectables : Mesh[];
     protected selectedMesh : Mesh;
     protected selectionColor : Color;
     protected raycaster : Raycaster;
 
+    protected composer : EffectComposer;
+
     constructor(
         orthographicMode : boolean = false,
         orbitMode : boolean = true,
-        selectioMode : boolean = false) {
+        selectioMode : boolean = false,
+        posProcessingMode : boolean = false) {
         ThreeAnimation.threeAnimations.push(this);
 
         this.loop = this.loop.bind(this);
@@ -66,6 +72,7 @@ export abstract class ThreeAnimation {
         this.orthographicMode = orthographicMode;
         this.orbitMode = orbitMode;
         this.selectionMode = selectioMode;
+        this.posProcessingMode = posProcessingMode;
 
         this.selectables = [];
         this.selectedMesh = undefined;
@@ -124,6 +131,10 @@ export abstract class ThreeAnimation {
             this.controls = new OrbitControls( this.camera, this.renderer.domElement );
         
         this.raycaster = new Raycaster();
+
+        if (this.posProcessingMode) {
+            this.composer = new EffectComposer(this.renderer);
+        }
         
         this.init();
         this.startTime = Date.now();
