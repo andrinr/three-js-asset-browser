@@ -13,6 +13,25 @@ export function deepClone(mesh : Mesh) : Mesh{
     }
 }
 
+export function setMeshMaterialProperties(mesh : Mesh, properties : THREE.MeshStandardMaterialParameters) {
+    if (mesh.material instanceof Array) {
+        mesh.material.forEach((material) => {
+            setMaterialProperties(material, properties);
+        });
+    }
+    else {
+        setMaterialProperties(mesh.material, properties);
+    }
+}
+
+export function setMaterialProperties(material : Material, properties : THREE.MeshStandardMaterialParameters) {
+    if (material instanceof MeshPhongMaterial) {
+        material.color.set(properties.color);
+        material.emissive.set(properties.emissive);
+        material.emissiveIntensity = properties.emissiveIntensity;
+    }
+}
+
 export function setMeshColor(mesh : Mesh, color : Color) {
     if (mesh.material instanceof Array) {
         mesh.material.forEach((material) => {
