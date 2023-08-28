@@ -138,8 +138,9 @@ export class MainAnimation extends ThreeAnimation {
 
                     this.scene.add(meshFront);
                     this.scene.add(meshBack);
-                    
+
                     this.areas.push(meshBack);
+                    this.areas.push(meshFront);
                 }
             }
             else {
