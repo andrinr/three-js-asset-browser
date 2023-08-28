@@ -17,7 +17,8 @@ import {
     PlaneGeometry,
     ShapeGeometry,
     Color,
-    FrontSide} from 'three';
+    FrontSide,
+    MeshStandardMaterial} from 'three';
 
 import { Sky } from 'three/examples/jsm/objects/Sky.js';
 import { get } from 'svelte/store';
@@ -40,6 +41,9 @@ export class MainAnimation extends ThreeAnimation {
     private dragPreviousPosition : Vector3;
     private dragValid : boolean;
     private areas : Mesh[];
+
+    private emissiveBack : MeshStandardMaterial;
+    private emissiveFront : MeshStandardMaterial;
 
     public constructor(
         loadedCallback : () => void
@@ -78,6 +82,20 @@ export class MainAnimation extends ThreeAnimation {
 
         this.dragValid = false;
 
+        this.emissiveBack = new MeshStandardMaterial({
+            emissive: 0x3dc8ff, 
+            transparent: true,
+            emissiveIntensity: 0.5,
+            opacity: 0.3,
+            side: BackSide});
+
+        this.emissiveFront = new MeshStandardMaterial({
+                emissive: 0x3dc8ff,
+                transparent: true,
+                emissiveIntensity: 0.5,
+                opacity: 0.3,
+                side: FrontSide});
+
         dragID.subscribe((id) => {
             if (id !== -1) {
                 const asset = get(assets)[id];
@@ -107,21 +125,8 @@ export class MainAnimation extends ThreeAnimation {
 
                     const geometry = new ExtrudeGeometry(outline, extrudeSettings);
 
-                    const materialFront = new MeshPhongMaterial({
-                        color: 0xb0fffa,
-                        transparent: true,
-                        opacity: 0.2,
-                        side: FrontSide});
-
-                    const meshFront = new Mesh(geometry, materialFront);
-
-                    const materialBack = new MeshPhongMaterial({
-                        color: 0xb0fffa, 
-                        transparent: true,
-                        opacity: 0.2,
-                        side: BackSide});
-
-                    const meshBack = new Mesh(geometry, materialBack);
+                    const meshFront = new Mesh(geometry, this.emissiveFront);
+                    const meshBack = new Mesh(geometry, this.emissiveBack);
 
                     const lookAt = new Matrix4().lookAt(new Vector3(0, 0, 0), area.normal, new Vector3(0, 1, 0));
 
@@ -132,11 +137,9 @@ export class MainAnimation extends ThreeAnimation {
                     meshBack.position.set(0, -2, 0);
 
                     this.scene.add(meshFront);
-                    this.areas.push(meshFront);
-
                     this.scene.add(meshBack);
+                    
                     this.areas.push(meshBack);
-
                 }
             }
             else {
@@ -193,13 +196,11 @@ export class MainAnimation extends ThreeAnimation {
             for (let area of this.areas) {
                 const boundingBoxArea = new Box3().setFromObject(area);
                 if (!boundingBoxArea.intersectsBox(boundingBoxDrag)) {
-                    console.log("not intersect");
                     setMeshColor(this.localDragMesh, new Color(0xff0000));
                     this.dragValid = false;
                     return;
                 }
                 else {
-                    console.log("intersect");
                     setMeshColor(this.localDragMesh, new Color(0xffffff));
                     this.dragValid = true;
                 }
@@ -225,13 +226,15 @@ export class MainAnimation extends ThreeAnimation {
 	}
 
 	private addLights() {
-		const light = new DirectionalLight( "0xffffff", 1.5 );
-	    light.position.multiplyScalar(0).add(this.sunPosition.clone().multiplyScalar(this.scale * 30));
-
+		const light = new DirectionalLight( "0xffffff", 1.0 );
+	    light.position.multiplyScalar(0).add(this.sunPosition.clone().multiplyScalar(this.scale * 10));
 		light.castShadow = true;
-
-		light.shadow.mapSize.width = 2048; 
-		light.shadow.mapSize.height = 2048;
+		light.shadow.mapSize.width = 4096; 
+		light.shadow.mapSize.height = 1024;
+        light.shadow.camera.top = 5;
+        light.shadow.camera.bottom = -5;
+        light.shadow.camera.left = -30;
+        light.shadow.camera.right = 30;
 		light.shadow.camera.near = 0.1;
 		light.shadow.camera.far = 100 * this.scale;
 		light.shadow.bias = -0.00001;
@@ -240,21 +243,22 @@ export class MainAnimation extends ThreeAnimation {
         const helper = new DirectionalLightHelper( light, 5 );
         this.scene.add( helper );
 
-		const ambientLight = new AmbientLight( "0xffffff");
-        ambientLight.intensity = 0.3;
+		//const ambientLight = new AmbientLight( "0xffffff");
+        //ambientLight.intensity = 0.1;
         
-        const hemiLight = new HemisphereLight( "0xffffff", "0xffffff", 0.4);
+        const hemiLight = new HemisphereLight( 0xffffff, 0x8d8d8d, 0.3 );
+        hemiLight.position.set(0, 20, 0);
 
         this.scene.add(light);
-        // this.scene.add(hemiLight);
-		// this.scene.add(ambientLight);
+        this.scene.add(hemiLight);
+		//this.scene.add(ambientLight);
 	}
 
 	private async addModels() {
 
         const planeY = -1;
         const floor = new PlaneGeometry(2000, 2000, 8, 8);
-        const floorMesh = new Mesh(floor, new MeshPhongMaterial({color: 0x6e6e6e}));
+        const floorMesh = new Mesh(floor, new MeshPhongMaterial({color: 0xffffff}));
         this.floorPlane = floorMesh;
         floorMesh.position.set(0, planeY, 0);
         floorMesh.rotateX(-Math.PI / 2);

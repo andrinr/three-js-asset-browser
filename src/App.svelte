@@ -164,8 +164,8 @@
   #assets-html {
     z-index: 2;
     overflow-y: scroll;
-    background-color: rgb(128, 128, 128);
-    color: white;
+    background-color: rgb(241, 241, 241);
+    color: black;
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
   }
