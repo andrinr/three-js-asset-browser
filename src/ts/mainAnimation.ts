@@ -7,9 +7,7 @@ import {
     Matrix4,
     Mesh,
     ExtrudeGeometry,
-    Box3,
     BackSide,
-    DoubleSide,
     Shape,
     HemisphereLight,
     DirectionalLightHelper,
@@ -25,7 +23,7 @@ import { Sky } from 'three/examples/jsm/objects/Sky.js';
 import { get } from 'svelte/store';
 // Local imports
 import { ThreeAnimation } from "./animation";
-import { dragID, assets, areaColor, highlightColor } from '../stores';
+import { dragID, assets, areaColor, highlightColor, wrongColor } from '../stores';
 import { deepClone, setMeshColor, loadGLTF } from './helpers';
 import { DragState, Dragger } from './dragger';
 
@@ -132,8 +130,8 @@ export class MainAnimation extends ThreeAnimation {
                     meshBack.applyMatrix4(lookAt);
                     meshBack.position.set(0, -2, 0);
 
-                    //this.scene.add(meshFront);
-                    //this.scene.add(meshBack);
+                    this.scene.add(meshFront);
+                    this.scene.add(meshBack);
 
                     this.areas.push(meshBack);
                     this.areas.push(meshFront);
@@ -175,10 +173,11 @@ export class MainAnimation extends ThreeAnimation {
             this.mouseDown, 
             this.mouseOnScreen);
         
-        if (this.dragger.state !== DragState.IDLE) {
+        if (this.dragger.state !== DragState.IDLE && this.mouseOnScreen) {
             console.log(this.dragger.state);
             this.selectedLight.position.copy(this.dragger.mesh.position);
             this.selectedLight.intensity = 1.0;
+            this.selectedLight.color = this.dragger.valid ? get(highlightColor) : get(wrongColor);
         }
         else {
             this.selectedLight.intensity = 0.0;
@@ -213,8 +212,8 @@ export class MainAnimation extends ThreeAnimation {
 		light.shadow.bias = -0.00001;
         light.shadow.radius = 0.7;
 
-        const helper = new DirectionalLightHelper( light, 5 );
-        this.scene.add( helper );
+        // const helper = new DirectionalLightHelper( light, 5 );
+        // this.scene.add( helper );
 
 		//const ambientLight = new AmbientLight( "0xffffff");
         //ambientLight.intensity = 0.1;
@@ -222,7 +221,7 @@ export class MainAnimation extends ThreeAnimation {
         const hemiLight = new HemisphereLight( 0xffffff, 0x8d8d8d, 0.3 );
         hemiLight.position.set(0, 20, 0);
 
-        this.selectedLight = new PointLight(get(highlightColor), 0, 5, 2);
+        this.selectedLight = new PointLight(get(highlightColor), 0, 3, 2);
         this.scene.add(this.selectedLight);
         this.scene.add(light);
         this.scene.add(hemiLight);

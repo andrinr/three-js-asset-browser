@@ -80,7 +80,7 @@ export class AssetsAnimation extends ThreeAnimation {
             const intersects = this.raycaster.intersectObject(this.floorPlane);
 
             if (assets[i].focused) 
-                highlight(this.assetMap.get(id));
+                highlight(this.assetMap.get(id), true);
             else
                 unhighlight(this.assetMap.get(id));
         

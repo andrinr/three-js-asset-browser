@@ -4,6 +4,7 @@ import {
     PerspectiveCamera, 
     Raycaster,
     Vector2,
+    Box3,
     Color,
     Scene} from "three";
 import { deepClone, highlight, setMeshMaterialProperties, unhighlight } from "./helpers";
@@ -25,6 +26,7 @@ export class Dragger {
     public mesh : Mesh;
     public areas : Mesh[];
     private intersectionPlane : Mesh;
+    public valid : boolean;
 
     constructor (
         camera : PerspectiveCamera | OrthographicCamera,
@@ -106,6 +108,26 @@ export class Dragger {
             const prevY = mesh.position.y;
             mesh.position.set(position.x, prevY, position.z);
         }
+
+        const boundingBox = new Box3().setFromObject(mesh);
+        let intersect = false;
+        for (let area of this.areas) {
+            const areaBoundingBox = new Box3().setFromObject(area);
+
+            if (boundingBox.intersectsBox(areaBoundingBox)) {
+                intersect = true;
+                break;
+            }
+        }
+
+        if (!intersect) {
+            this.valid = false;
+            highlight(mesh, false);
+        }
+        else {
+            this.valid = true;
+            highlight(mesh, true);
+        }
     }
 
     private getIntersectedMesh(mousePosition : Vector2) : Mesh | undefined {
@@ -123,7 +145,7 @@ export class Dragger {
     }
 
     public select(mesh : Mesh) {
-        highlight(mesh);
+        highlight(mesh, true);
     }
 
     public unselect(mesh : Mesh) {      

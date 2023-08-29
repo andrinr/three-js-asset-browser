@@ -3,33 +3,39 @@ import type { Color, Group, Material } from "three";
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import type THREE from 'three';
-import { highlightColor } from "../stores";
+import { highlightColor, wrongColor } from "../stores";
 import { get } from 'svelte/store';
 
-export function highlight(mesh : Mesh) {
-    if (mesh.userData['highlighted'])
-        return;
+export function highlight(mesh : Mesh, valid : boolean) {
+    let previousMaterial = undefined;
+    if (mesh.material instanceof Array) {
+        previousMaterial = mesh.material[0].clone();
+    } else {
+        previousMaterial = mesh.material.clone();
+    }
 
-    if (mesh.material instanceof Array) 
-        mesh.userData['previousMaterial'] = mesh.material[0].clone();
-    else
-        mesh.userData['previousMaterial'] = mesh.material.clone();
-
-    mesh.userData['highlighted'] = true;
-
+    mesh.renderOrder = -1000;
     setMeshMaterial(mesh, new MeshBasicMaterial(
         {
-            color: get(highlightColor),
+            color: (valid ? get(highlightColor) : get(wrongColor)),
             transparent: true,
             opacity: 0.6,
         }
     ));
+
+    if (mesh.userData['highlighted'])
+        return;
+    
+    mesh.userData['previousMaterial'] = previousMaterial;
+    mesh.userData['highlighted'] = true;
+
 }
 
 export function unhighlight(mesh : Mesh) {
     if (!mesh.userData['highlighted'])
         return;
 
+    mesh.renderOrder = 0;
     setMeshMaterial(mesh, mesh.userData['previousMaterial']);
     mesh.userData['highlighted'] = false;
 }
