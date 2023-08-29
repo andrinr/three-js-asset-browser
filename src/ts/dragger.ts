@@ -10,7 +10,7 @@ import { deepClone, highlight, setMeshMaterialProperties, unhighlight } from "./
 
 import { dragID } from '../stores';
 
-enum MeshState {
+export enum DragState {
     IDLE,
     SELECTED,
     DRAGGING,
@@ -21,7 +21,7 @@ export class Dragger {
     private raycaster : Raycaster;
     private camera : PerspectiveCamera | OrthographicCamera;
 
-    public state : MeshState;
+    public state : DragState;
     public mesh : Mesh;
     public areas : Mesh[];
     private intersectionPlane : Mesh;
@@ -34,7 +34,7 @@ export class Dragger {
         this.camera = camera;
         this.intersectionPlane = intersectionPlane;
 
-        this.state = MeshState.IDLE;
+        this.state = DragState.IDLE;
         this.selectables = [];
     }
 
@@ -42,17 +42,17 @@ export class Dragger {
 
         const intersectionMesh = this.getIntersectedMesh(mousePosition);
 
-        // Mouse intersects with a mesh put not pressed
+        // Mouse intersects with a mesh but is not pressed
         // In this case we highlight the mesh
-        if (intersectionMesh && !click && this.state === MeshState.IDLE) {
+        if (intersectionMesh && !click && this.state === DragState.IDLE) {
             this.select(intersectionMesh);
             this.mesh = intersectionMesh;
-            this.state = MeshState.SELECTED;
+            this.state = DragState.SELECTED;
 
             console.log("Mouse intersects with a mesh put not pressed");
         }
         // Mouse intersects with a mesh and is pressed for the first time
-        // In this case we select the mesh and start dragging it
+        // In this case we trigger the drag
         else if (intersectionMesh && click) {
   
             dragID.set(this.mesh.userData['assetID']);
@@ -61,14 +61,16 @@ export class Dragger {
         }
         // Mouse is still pressed and dragging the mesh
         // In this case we simply update the mesh position
-        else if (this.state === MeshState.DRAGGING && mouseOnScreen) {
+        else if (this.state === DragState.DRAGGING && mouseOnScreen) {
             this.dragMesh(this.mesh, mousePosition);
 
             console.log("Mouse is still pressed and dragging the mesh");
         }
-        else {
+        else if (this.mesh && this.state !== DragState.DRAGGING) {
             this.unselect(this.mesh);
-            this.state = MeshState.IDLE;
+            this.state = DragState.IDLE;
+
+            console.log("Stop drag")
         }
         
     }
@@ -78,13 +80,18 @@ export class Dragger {
         this.mesh.userData['assetID'] = id;
         this.mesh.castShadow = true;
         this.mesh.receiveShadow = true;
-        this.state = MeshState.DRAGGING;
+        this.state = DragState.DRAGGING;
+
+        console.log("Start drag");
+
+        this.select(this.mesh);
 
         this.areas = areas;
     }
 
     public stopDrag() {
-        this.state = MeshState.SELECTED;
+        this.state = DragState.SELECTED;
+        this.unselect(this.mesh);
     }
 
     public dragMesh(mesh : Mesh, mousePosition : Vector2) {
@@ -118,16 +125,10 @@ export class Dragger {
     }
 
     public select(mesh : Mesh) {
-        if (!mesh) return;
-
         highlight(mesh);
     }
 
-    public unselect(mesh : Mesh) {
-        if (!mesh) return;
-
-        console.log(mesh);
-        
+    public unselect(mesh : Mesh) {        
         unhighlight(mesh);
     }
 

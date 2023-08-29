@@ -26,7 +26,7 @@ import { get } from 'svelte/store';
 import { ThreeAnimation } from "./animation";
 import { dragID, assets, areaColor } from '../stores';
 import { deepClone, setMeshColor, loadGLTF } from './helpers';
-import { Dragger } from './dragger';
+import { DragState, Dragger } from './dragger';
 
 
 export class MainAnimation extends ThreeAnimation {
@@ -142,8 +142,10 @@ export class MainAnimation extends ThreeAnimation {
                 this.controls.enabled = false;
             }
             else {
+                if (this.dragger.state !== DragState.DRAGGING) return;
+                
                 if (this.mouseOnScreen) {
-                    this.dragger.unselect(this.dragger.mesh);
+                    this.dragger.stopDrag();
                     this.dragger.addAsset(this.dragger.mesh);
                 }
                 else {
