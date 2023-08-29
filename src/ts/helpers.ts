@@ -68,6 +68,11 @@ export function setMaterialProperties(material : Material, properties : THREE.Me
         material.color.set(properties.color);
         material.emissive.set(properties.emissive);
         material.emissiveIntensity = properties.emissiveIntensity;
+        material.opacity = properties.opacity;
+        material.transparent = properties.transparent;
+        material.side = properties.side;
+        material.blending = properties.blending;
+        material.visible = properties.visible;
     }
 }
 

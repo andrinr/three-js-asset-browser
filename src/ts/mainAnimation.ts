@@ -100,6 +100,8 @@ export class MainAnimation extends ThreeAnimation {
 
                 const dragAreas = [];
 
+                this.scene.remove(asset.mesh);
+
                 for (let area of asset.areas) {
                     const outline = new Shape();
                     outline.moveTo(area.boundingBox.min.x, area.boundingBox.min.y);
@@ -126,8 +128,8 @@ export class MainAnimation extends ThreeAnimation {
                     meshBack.applyMatrix4(lookAt);
                     meshBack.position.set(0, -2, 0);
 
-                    this.scene.add(meshFront);
-                    this.scene.add(meshBack);
+                    //this.scene.add(meshFront);
+                    //this.scene.add(meshBack);
 
                     this.areas.push(meshBack);
                     this.areas.push(meshFront);
@@ -136,14 +138,14 @@ export class MainAnimation extends ThreeAnimation {
                 }
 
                 this.dragger.startDrag(asset.mesh, id, dragAreas);
-                this.dragger.dragMesh(this.dragger.mesh, this.mousePosition);
+                this.dragger.dragMesh(this.dragger.mesh, this.mousePosition, this.mouseOnScreen);
 
                 this.scene.add(this.dragger.mesh);
                 this.controls.enabled = false;
             }
             else {
                 if (this.dragger.state !== DragState.DRAGGING) return;
-                
+
                 if (this.mouseOnScreen) {
                     this.dragger.stopDrag();
                     this.dragger.addAsset(this.dragger.mesh);

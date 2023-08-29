@@ -54,19 +54,20 @@ export class Dragger {
         // Mouse intersects with a mesh and is pressed for the first time
         // In this case we trigger the drag
         else if (intersectionMesh && click) {
-  
+            
+            this.mesh = intersectionMesh;
             dragID.set(this.mesh.userData['assetID']);
    
             console.log("Mouse intersects with a mesh and is pressed for the first time");
         }
         // Mouse is still pressed and dragging the mesh
         // In this case we simply update the mesh position
-        else if (this.state === DragState.DRAGGING && mouseOnScreen) {
-            this.dragMesh(this.mesh, mousePosition);
+        else if (this.state === DragState.DRAGGING) {
+            this.dragMesh(this.mesh, mousePosition, mouseOnScreen);
 
             console.log("Mouse is still pressed and dragging the mesh");
         }
-        else if (this.mesh && this.state !== DragState.DRAGGING) {
+        else if (this.mesh) {
             this.unselect(this.mesh);
             this.state = DragState.IDLE;
 
@@ -94,12 +95,18 @@ export class Dragger {
         this.unselect(this.mesh);
     }
 
-    public dragMesh(mesh : Mesh, mousePosition : Vector2) {
-        console.log(this.intersectionPlane);
+    public dragMesh(mesh : Mesh, mousePosition : Vector2, mouseOnScreen : boolean) {
+        this.mesh = mesh;
+        if (!mouseOnScreen) {
+            mesh.visible = false;
+        }
+        else {
+            mesh.visible = true;
+        }
+
         this.raycaster.setFromCamera(mousePosition, this.camera);
         const intersections = this.raycaster.intersectObject(this.intersectionPlane);
         
-        console.log(mesh);
         if (intersections.length > 0) {
             const intersection = intersections[0];
 
@@ -125,10 +132,12 @@ export class Dragger {
     }
 
     public select(mesh : Mesh) {
+        console.log("Select");
         highlight(mesh);
     }
 
-    public unselect(mesh : Mesh) {        
+    public unselect(mesh : Mesh) {      
+        console.log("Unselect");  
         unhighlight(mesh);
     }
 
