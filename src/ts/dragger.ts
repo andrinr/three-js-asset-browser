@@ -4,60 +4,90 @@ import {
     PerspectiveCamera, 
     Raycaster,
     Vector2,
-    Color} from "three";
-import { setMeshMaterialProperties } from "./helpers";
+    Color,
+    Scene} from "three";
+import { deepClone, setMeshMaterialProperties } from "./helpers";
 
 import { dragID, assets } from '../stores';
+import type { Area } from "./assetInstance";
 
-class Dragger {
+export class Dragger {
     private selectables : Mesh[];
     private raycaster : Raycaster;
     private camera : PerspectiveCamera | OrthographicCamera;
     private emissiveColor : Color;
 
-    private hoveredMesh : Mesh;
-    private draggedMesh : Mesh;
+    public mesh : Mesh;
+    public areas : Mesh[];
+    private dragging : boolean;
     private intersectionPlane : Mesh;
-
 
     constructor (
         camera : PerspectiveCamera | OrthographicCamera,
         emissiveColor : Color,
-        intersectionPlane : Mesh
+        intersectionPlane : Mesh,
     ) {
         this.raycaster = new Raycaster();
         this.camera = camera;
         this.emissiveColor = emissiveColor;
         this.intersectionPlane = intersectionPlane;
+
+        this.dragging = false;
+        this.selectables = [];
     }
 
     public update(mousePosition : Vector2, click : boolean, mouseDown : boolean, mouseOnScreen : boolean) {
 
         const intersectionMesh = this.getIntersectedMesh(mousePosition);
-
+        // Mouse intersects with a mesh put not pressed
+        // In this case we highlight the mesh
         if (intersectionMesh && !mouseDown) {
             this.select(intersectionMesh);
-            this.hoveredMesh = intersectionMesh;
+            this.mesh = intersectionMesh;
         }
+        // Mouse intersects with a mesh and is pressed for the first time
+        // In this case we select the mesh and start dragging it
         else if (intersectionMesh && click) {
             this.select(intersectionMesh);
-            this.draggedMesh = intersectionMesh;
-            dragID.set(this.draggedMesh.userData['id']);
+            this.mesh = intersectionMesh;
+            this.dragging = true;
+            dragID.set(this.mesh.userData['id']);
         }
-        else if (this.draggedMesh && mouseDown) {
-            this.dragMesh(this.draggedMesh, mousePosition);
+        // Mouse is still pressed and dragging the mesh
+        // In this case we simply update the mesh position
+        else if (this.dragging && mouseDown) {
+            this.dragMesh(this.mesh, mousePosition);
         }
-        else if (this.draggedMesh && !mouseDown) {
-            this.unselect(this.draggedMesh);
-            this.draggedMesh = undefined;
+        // Mouse is not pressed anymore
+        // In this case we unselect the mesh and stop dragging it
+        else if (this.dragging && !mouseDown) {
+            this.unselect(this.mesh);
+            this.dragging = false;
             dragID.set(-1);
+        }
+        else {
+            this.unselect(this.mesh);
+            this.mesh = undefined;
         }
         
     }
 
-    private dragMesh(mesh : Mesh, mousePosition : Vector2) {
-        const intersections = this.raycaster.intersectObject(this.intersectionPlane);
+    public startDrag(mesh : Mesh, id : number, areas : Mesh[]) {
+        this.mesh = deepClone(mesh);
+        this.mesh.userData['assetID'] = id;
+        this.mesh.castShadow = true;
+        this.mesh.receiveShadow = true;
+        this.dragging = true;
 
+        this.areas = areas;
+    }
+
+    public dragMesh(mesh : Mesh, mousePosition : Vector2) {
+        console.log(this.intersectionPlane);
+        this.raycaster.setFromCamera(mousePosition, this.camera);
+        const intersections = this.raycaster.intersectObject(this.intersectionPlane);
+        
+        console.log(mesh);
         if (intersections.length > 0) {
             const intersection = intersections[0];
 
@@ -82,31 +112,29 @@ class Dragger {
         return undefined;
     }
 
-    private select(mesh : Mesh) {
+    public select(mesh : Mesh) {
+        if (!mesh) return;
+
         setMeshMaterialProperties(mesh, {
             emissive: this.emissiveColor,
             emissiveIntensity: 1,
         });
     }
 
-    private unselect(mesh : Mesh) {
+    public unselect(mesh : Mesh) {
+        if (!mesh) return;
+        
         setMeshMaterialProperties(mesh, {
             emissive: new Color(0x000000),
             emissiveIntensity: 0,
         });
     }
 
-
-
-
-    private addAsset(asset : Mesh, id : number) {
-        asset.userData.id = id;
+    public addAsset(asset : Mesh) {
         this.selectables.push(asset);
     }
 
-    private removeAsset(asset : Mesh) {
+    public removeAsset(asset : Mesh) {
         this.selectables.splice(this.selectables.indexOf(asset), 1);
     }
-
-
 }

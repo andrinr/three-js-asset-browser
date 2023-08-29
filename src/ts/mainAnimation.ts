@@ -26,6 +26,7 @@ import { get } from 'svelte/store';
 import { ThreeAnimation } from "./animation";
 import { dragID, assets } from '../stores';
 import { deepClone, setMeshColor, loadGLTF } from './helpers';
+import { Dragger } from './dragger';
 
 
 export class MainAnimation extends ThreeAnimation {
@@ -36,14 +37,12 @@ export class MainAnimation extends ThreeAnimation {
     private intersectionPlane : Mesh;
 
     private loadedCallback : () => void;
-
-    private localDragMesh : Mesh;
-    private dragPreviousPosition : Vector3;
-    private dragValid : boolean;
     private areas : Mesh[];
 
     private emissiveBack : MeshStandardMaterial;
     private emissiveFront : MeshStandardMaterial;
+
+    private dragger : Dragger;
 
     public constructor(
         loadedCallback : () => void
@@ -80,7 +79,7 @@ export class MainAnimation extends ThreeAnimation {
         this.selectables = [];
         this.areas = [];
 
-        this.dragValid = false;
+        this.dragger = new Dragger(this.camera, new Color("orange"), this.intersectionPlane);
 
         this.emissiveBack = new MeshStandardMaterial({
             emissive: 0x3dc8ff, 
@@ -99,16 +98,8 @@ export class MainAnimation extends ThreeAnimation {
         dragID.subscribe((id) => {
             if (id !== -1) {
                 const asset = get(assets)[id];
-                this.localDragMesh = deepClone(asset.mesh);
-                this.localDragMesh.userData['assetID'] = id;
-                this.localDragMesh.castShadow = true;
-                this.localDragMesh.receiveShadow = true;
 
-                this.scene.add(this.localDragMesh);
-
-                this.setDragMeshPosition();
-
-                this.controls.enabled = false;
+                const dragAreas = [];
 
                 for (let area of asset.areas) {
                     const outline = new Shape();
@@ -141,22 +132,25 @@ export class MainAnimation extends ThreeAnimation {
 
                     this.areas.push(meshBack);
                     this.areas.push(meshFront);
+
+                    dragAreas.push(meshBack);
                 }
+
+                this.dragger.startDrag(asset.mesh, id, dragAreas);
+                this.dragger.dragMesh(this.dragger.mesh, this.mousePosition);
+
+                this.scene.add(this.dragger.mesh);
+                this.controls.enabled = false;
             }
             else {
                 if (this.mouseOnScreen) {
-                    this.unselect(this.localDragMesh);
-                    this.selectables.push(this.localDragMesh);
-
-                    if (!this.dragValid) {
-                        this.localDragMesh.position.set(this.dragPreviousPosition.x, this.dragPreviousPosition.y, this.dragPreviousPosition.z);
-                    }
+                    this.dragger.unselect(this.dragger.mesh);
+                    this.dragger.addAsset(this.dragger.mesh);
                 }
                 else {
-                    this.scene.remove(this.localDragMesh);
+                    this.scene.remove(this.dragger.mesh);
                 }
                 this.controls.enabled = true;
-                this.localDragMesh = undefined;
 
                 for (let area of this.areas) {
                     this.scene.remove(area);
@@ -166,51 +160,11 @@ export class MainAnimation extends ThreeAnimation {
     }
 
     public update(delta: number): void {
-        this.setDragMeshPosition();
-        if (this.selectedMesh && this.click) {
-            this.scene.remove(this.selectedMesh);
-            dragID.set(this.selectedMesh.userData['assetID']);
-            this.dragPreviousPosition = this.selectedMesh.position.clone();
-        }
-
-        if (this.selectedMesh && !this.mouseDown) {
-            dragID.set(-1);
-        }
-    }
-
-    private setDragMeshPosition() {
-        this.raycaster.setFromCamera( this.mousePosition, this.camera );
-        if (this.localDragMesh && this.mouseOnScreen) {
-            const intersections = this.raycaster.intersectObject(this.intersectionPlane);
-
-            if (intersections.length > 0) {
-                const intersection = intersections[0];
-
-                const position = intersection.point;
-
-                const prevY = this.localDragMesh.position.y;
-                this.localDragMesh.position.set(position.x, prevY, position.z);
-            }
-
-            const boundingBoxDrag = new Box3().setFromObject(this.localDragMesh);
-
-            for (let area of this.areas) {
-                const boundingBoxArea = new Box3().setFromObject(area);
-                if (!boundingBoxArea.intersectsBox(boundingBoxDrag)) {
-                    setMeshColor(this.localDragMesh, new Color(0xff0000));
-                    this.dragValid = false;
-                    return;
-                }
-                else {
-                    setMeshColor(this.localDragMesh, new Color(0xffffff));
-                    this.dragValid = true;
-                }
-            }
-
-        }
-        else if (this.localDragMesh) {
-            this.localDragMesh.position.set(10000, 0, 0);
-        }
+        this.dragger.update(
+            this.mousePosition, 
+            this.click, 
+            this.mouseDown, 
+            this.mouseOnScreen);
     }
 
 	private addSky () {
