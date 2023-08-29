@@ -24,7 +24,7 @@ import { Sky } from 'three/examples/jsm/objects/Sky.js';
 import { get } from 'svelte/store';
 // Local imports
 import { ThreeAnimation } from "./animation";
-import { dragID, assets } from '../stores';
+import { dragID, assets, areaColor } from '../stores';
 import { deepClone, setMeshColor, loadGLTF } from './helpers';
 import { Dragger } from './dragger';
 
@@ -47,7 +47,7 @@ export class MainAnimation extends ThreeAnimation {
     public constructor(
         loadedCallback : () => void
         ) {
-        super(false, true, true);
+        super(false, true, false);
         this.loadedCallback = loadedCallback;
     }
 
@@ -76,20 +76,19 @@ export class MainAnimation extends ThreeAnimation {
         this.addSky();
         this.addModels(); 
 
-        this.selectables = [];
         this.areas = [];
 
-        this.dragger = new Dragger(this.camera, new Color("orange"), this.intersectionPlane);
+        this.dragger = new Dragger(this.camera, this.intersectionPlane);
 
         this.emissiveBack = new MeshStandardMaterial({
-            emissive: 0x3dc8ff, 
+            emissive: get(areaColor),
             transparent: true,
             emissiveIntensity: 0.5,
             opacity: 0.3,
             side: BackSide});
 
         this.emissiveFront = new MeshStandardMaterial({
-                emissive: 0x3dc8ff,
+                emissive: get(areaColor),
                 transparent: true,
                 emissiveIntensity: 0.5,
                 opacity: 0.3,
@@ -155,6 +154,8 @@ export class MainAnimation extends ThreeAnimation {
                 for (let area of this.areas) {
                     this.scene.remove(area);
                 }
+
+                this.dragger.stopDrag();
             }
         });
     }

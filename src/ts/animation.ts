@@ -40,17 +40,11 @@ export abstract class ThreeAnimation {
     protected selectionMode : boolean;
     protected posProcessingMode : boolean;
 
-    protected selectables : Mesh[];
-    protected selectedMesh : Mesh;
-    protected selectionColor : Color;
-    protected raycaster : Raycaster;
-
     protected composer : EffectComposer;
 
     constructor(
         orthographicMode : boolean = false,
         orbitMode : boolean = true,
-        selectioMode : boolean = false,
         posProcessingMode : boolean = false) {
         ThreeAnimation.threeAnimations.push(this);
 
@@ -71,12 +65,7 @@ export abstract class ThreeAnimation {
 
         this.orthographicMode = orthographicMode;
         this.orbitMode = orbitMode;
-        this.selectionMode = selectioMode;
         this.posProcessingMode = posProcessingMode;
-
-        this.selectables = [];
-        this.selectedMesh = undefined;
-        this.selectionColor = new Color(0xffbb00);
     }
 
     public abstract init() : void;
@@ -130,11 +119,9 @@ export abstract class ThreeAnimation {
         if (this.orbitMode)
             this.controls = new OrbitControls( this.camera, this.renderer.domElement );
         
-        this.raycaster = new Raycaster();
-
-        if (this.posProcessingMode) {
+        if (this.posProcessingMode) 
             this.composer = new EffectComposer(this.renderer);
-        }
+        
         
         this.init();
         this.startTime = Date.now();
@@ -150,40 +137,12 @@ export abstract class ThreeAnimation {
 		this.lastTime = Date.now();
         this.secondsPassed = (Date.now() - this.startTime) / 1000;
 
-        if (this.selectionMode) {
-            this.raycaster.setFromCamera( this.mousePosition, this.camera );
-
-            const intersects = this.raycaster.intersectObjects( this.selectables );
-
-            if (intersects.length > 0) {
-
-                const intersect = intersects[0];
-                const mesh = intersect.object as Mesh;
-
-                
-                this.selectedMesh = mesh;
-                this.select(this.selectedMesh);
-            }
-            else {
-                this.unselect(this.selectedMesh);
-                this.selectedMesh = undefined;
-            }
-        }
 
         this.update(dt);
 
         this.click = false;
 
         this.renderer.render( this.scene, this.camera );
-    }
-
-    protected select(mesh : Mesh) {
-        setMeshColor(mesh, this.selectionColor);
-    }
-
-    protected unselect(mesh : Mesh) {
-        if (mesh === undefined) return;
-        setMeshColor(mesh, new Color(0xffffff));
     }
 
     public onMouseMove(event : MouseEvent) : void {

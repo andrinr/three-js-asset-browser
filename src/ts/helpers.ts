@@ -1,8 +1,36 @@
-import { Mesh, MeshBasicMaterial, MeshPhongMaterial } from "three";
+import { AdditiveBlending, Mesh, MeshBasicMaterial, MeshPhongMaterial } from "three";
 import type { Color, Group, Material } from "three";
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import type THREE from 'three';
+import { highlightColor } from "../stores";
+import { get } from 'svelte/store';
+
+export function highlight(mesh : Mesh) {
+    if (mesh.material instanceof Array) {
+        mesh.userData['previousMaterial'] = mesh.material[0].clone();
+        mesh.userData['highlighted'] = true;
+    }
+    else {
+        mesh.userData['previousMaterial'] = mesh.material.clone();
+        mesh.userData['highlighted'] = true;
+    }
+    setMeshMaterial(mesh, new MeshBasicMaterial(
+        {
+            color: get(highlightColor),
+            transparent: true,
+            opacity: 0.6,
+        }
+    ));
+}
+
+export function unhighlight(mesh : Mesh) {
+    if (!mesh.userData['highlighted'])
+        return;
+
+    setMeshMaterial(mesh, mesh.userData['previousMaterial']);
+    mesh.userData['highlighted'] = false;
+}
 
 export function deepClone(mesh : Mesh) : Mesh{
     if (mesh.material instanceof Array) {
@@ -10,6 +38,17 @@ export function deepClone(mesh : Mesh) : Mesh{
     }
     else {
         return new Mesh(mesh.geometry.clone(), mesh.material.clone());
+    }
+}
+
+export function setMeshMaterial(mesh : Mesh, material : Material) {
+    if (mesh.material instanceof Array) {
+        mesh.material.forEach((mat) => {
+            mat = material;
+        });
+    }
+    else {
+        mesh.material = material;
     }
 }
 

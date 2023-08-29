@@ -12,7 +12,7 @@ import {
 import { ThreeAnimation } from "./animation";
 import type {AssetInstance} from './assetInstance';
 import { assets } from '../stores';
-import { setMeshColor } from './helpers';
+import { highlight, setMeshColor, unhighlight } from './helpers';
 
 export class AssetsAnimation extends ThreeAnimation {
 
@@ -22,6 +22,8 @@ export class AssetsAnimation extends ThreeAnimation {
     private assetMap : Map<number, Mesh>;
 
     private hemiLight : HemisphereLight;
+
+    private raycaster : Raycaster;
 
     public constructor(
         loadedCallback : () => void,
@@ -34,12 +36,12 @@ export class AssetsAnimation extends ThreeAnimation {
 
     public init(): void {
    
-        this.raycaster = new Raycaster();
-
         //this.camera.position.set(1, 1, 1);
 
         this.camera.position.set(0, 0, 10);
         this.camera.zoom = 100;
+
+        this.raycaster = new Raycaster();
 
         this.addLights();
         this.addModels(); 
@@ -61,6 +63,7 @@ export class AssetsAnimation extends ThreeAnimation {
     }
 
     public updateAssets(assets : AssetInstance[]) {
+
         for (let i = 0; i < assets.length; i++) {
 
             const id = assets[i].id;
@@ -77,9 +80,9 @@ export class AssetsAnimation extends ThreeAnimation {
             const intersects = this.raycaster.intersectObject(this.floorPlane);
 
             if (assets[i].focused) 
-                this.select(this.assetMap.get(id));
+                highlight(this.assetMap.get(id));
             else
-                this.unselect(this.assetMap.get(id));
+                unhighlight(this.assetMap.get(id));
         
 
             if (intersects.length > 0) {  
