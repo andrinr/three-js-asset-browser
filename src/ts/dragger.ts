@@ -48,30 +48,21 @@ export class Dragger {
             this.select(intersectionMesh);
             this.mesh = intersectionMesh;
             this.state = DragState.SELECTED;
-
-            console.log("Mouse intersects with a mesh put not pressed");
         }
         // Mouse intersects with a mesh and is pressed for the first time
         // In this case we trigger the drag
         else if (intersectionMesh && click) {
-            
             this.mesh = intersectionMesh;
             dragID.set(this.mesh.userData['assetID']);
-   
-            console.log("Mouse intersects with a mesh and is pressed for the first time");
         }
         // Mouse is still pressed and dragging the mesh
         // In this case we simply update the mesh position
         else if (this.state === DragState.DRAGGING) {
             this.dragMesh(this.mesh, mousePosition, mouseOnScreen);
-
-            console.log("Mouse is still pressed and dragging the mesh");
         }
-        else if (this.mesh) {
+        else if (!intersectionMesh && this.mesh) {
             this.unselect(this.mesh);
             this.state = DragState.IDLE;
-
-            console.log("Stop drag")
         }
         
     }
@@ -132,12 +123,10 @@ export class Dragger {
     }
 
     public select(mesh : Mesh) {
-        console.log("Select");
         highlight(mesh);
     }
 
     public unselect(mesh : Mesh) {      
-        console.log("Unselect");  
         unhighlight(mesh);
     }
 

@@ -18,13 +18,14 @@ import {
     ShapeGeometry,
     Color,
     FrontSide,
-    MeshStandardMaterial} from 'three';
+    MeshStandardMaterial,
+    PointLight} from 'three';
 
 import { Sky } from 'three/examples/jsm/objects/Sky.js';
 import { get } from 'svelte/store';
 // Local imports
 import { ThreeAnimation } from "./animation";
-import { dragID, assets, areaColor } from '../stores';
+import { dragID, assets, areaColor, highlightColor } from '../stores';
 import { deepClone, setMeshColor, loadGLTF } from './helpers';
 import { DragState, Dragger } from './dragger';
 
@@ -41,6 +42,8 @@ export class MainAnimation extends ThreeAnimation {
 
     private emissiveBack : MeshStandardMaterial;
     private emissiveFront : MeshStandardMaterial;
+
+    private selectedLight : PointLight;
 
     private dragger : Dragger;
 
@@ -101,6 +104,7 @@ export class MainAnimation extends ThreeAnimation {
                 const dragAreas = [];
 
                 this.scene.remove(asset.mesh);
+                this.scene.remove(this.dragger.mesh);
 
                 for (let area of asset.areas) {
                     const outline = new Shape();
@@ -170,6 +174,15 @@ export class MainAnimation extends ThreeAnimation {
             this.click, 
             this.mouseDown, 
             this.mouseOnScreen);
+        
+        if (this.dragger.state !== DragState.IDLE) {
+            console.log(this.dragger.state);
+            this.selectedLight.position.copy(this.dragger.mesh.position);
+            this.selectedLight.intensity = 1.0;
+        }
+        else {
+            this.selectedLight.intensity = 0.0;
+        }
     }
 
 	private addSky () {
@@ -209,6 +222,8 @@ export class MainAnimation extends ThreeAnimation {
         const hemiLight = new HemisphereLight( 0xffffff, 0x8d8d8d, 0.3 );
         hemiLight.position.set(0, 20, 0);
 
+        this.selectedLight = new PointLight(get(highlightColor), 0, 5, 2);
+        this.scene.add(this.selectedLight);
         this.scene.add(light);
         this.scene.add(hemiLight);
 		//this.scene.add(ambientLight);

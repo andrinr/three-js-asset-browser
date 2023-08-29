@@ -7,14 +7,16 @@ import { highlightColor } from "../stores";
 import { get } from 'svelte/store';
 
 export function highlight(mesh : Mesh) {
-    if (mesh.material instanceof Array) {
+    if (mesh.userData['highlighted'])
+        return;
+
+    if (mesh.material instanceof Array) 
         mesh.userData['previousMaterial'] = mesh.material[0].clone();
-        mesh.userData['highlighted'] = true;
-    }
-    else {
+    else
         mesh.userData['previousMaterial'] = mesh.material.clone();
-        mesh.userData['highlighted'] = true;
-    }
+
+    mesh.userData['highlighted'] = true;
+
     setMeshMaterial(mesh, new MeshBasicMaterial(
         {
             color: get(highlightColor),
