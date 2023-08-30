@@ -21,6 +21,7 @@ export class Dragger {
     private selectables : Mesh[];
     private raycaster : Raycaster;
     private camera : PerspectiveCamera | OrthographicCamera;
+    private scene : Scene;
 
     public state : DragState;
     public mesh : Mesh;
@@ -31,13 +32,16 @@ export class Dragger {
     constructor (
         camera : PerspectiveCamera | OrthographicCamera,
         intersectionPlane : Mesh,
+        scene : Scene
     ) {
         this.raycaster = new Raycaster();
         this.camera = camera;
         this.intersectionPlane = intersectionPlane;
+        this.scene = scene;
 
         this.state = DragState.IDLE;
         this.selectables = [];
+        
     }
 
     public update(mousePosition : Vector2, click : boolean, mouseDown : boolean, mouseOnScreen : boolean) {
@@ -55,6 +59,7 @@ export class Dragger {
         // In this case we trigger the drag
         else if (intersectionMesh && click) {
             this.mesh = intersectionMesh;
+            this.scene.remove(this.mesh);
             dragID.set(this.mesh.userData['assetID']);
         }
         // Mouse is still pressed and dragging the mesh

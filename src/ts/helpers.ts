@@ -23,10 +23,6 @@ export function highlight(mesh : Mesh, valid : boolean) {
         }
     ));
 
-    console.log("select")
-    console.log(mesh.userData['assetID'])
-    console.log(mesh.userData['previousMaterial'])
-
     if (mesh.userData['previousMaterial'])
         return;
     
@@ -35,11 +31,7 @@ export function highlight(mesh : Mesh, valid : boolean) {
 }
 
 export function unhighlight(mesh : Mesh) {
-
-    console.log("unselect")
-    console.log(mesh.userData['assetID'])
-    console.log(mesh.userData['previousMaterial'])
-
+        
     if (!mesh.userData['previousMaterial'])
         return;
 

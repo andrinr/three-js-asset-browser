@@ -80,7 +80,7 @@ export class MainAnimation extends ThreeAnimation {
 
         this.areas = [];
 
-        this.dragger = new Dragger(this.camera, this.intersectionPlane);
+        this.dragger = new Dragger(this.camera, this.intersectionPlane, this.scene);
 
         this.emissiveBack = new MeshStandardMaterial({
             emissive: get(areaColor),
