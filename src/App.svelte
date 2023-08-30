@@ -108,7 +108,7 @@
     
     <div 
       id="wrapper-assets" 
-      class="assets" 
+      class="assets bg-0" 
       use:watchResize={assetsAnimation.resize}
       bind:this={wrapperAssets}
     >
@@ -162,12 +162,12 @@
   #wrapper-assets {
     pointer-events: none;
     z-index: 5;
+    border-left: solid 1px var(--white-1);
   }
 
   #assets-html {
     z-index: 2;
     overflow-y: scroll;
-    background-color: rgb(241, 241, 241);
     color: black;
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */

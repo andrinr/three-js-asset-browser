@@ -73,7 +73,7 @@
   
     {#each $assets as asset, i}
       <div 
-        class="item" 
+        class="item soft-shadow" 
         id="item-{i}" 
         on:mouseenter={
           () => {
@@ -124,25 +124,25 @@
     flex-basis: 130px;
     flex-grow: 1;
     height: 130px;
-    padding: 0;
-    margin: 10px 0px;
+    margin: 5px 5px;
     transition: 0.1s;
-    border: solid 1px transparent;
+    border: solid 1px var(--white-1);
+    border-radius: 5px;
   }
 
   .item:hover{
-    border: dashed 1px black;
-    border-radius: 10px;
     cursor: pointer;
+    box-shadow: 0 0 10px var(--white-2);
   }
 
   p{
-    margin: 2px;
+    margin: 8px;
     text-align: center;
   }
 
   h2 {
-    margin-top: 1rem 2rem;
+    margin-top: 2rem;
+    margin-bottom: 0rem;
     text-align: center;
   }
 </style>
