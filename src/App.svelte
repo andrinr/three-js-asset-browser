@@ -2,11 +2,11 @@
   import { onMount } from "svelte";
   import { watchResize } from "svelte-watch-resize";
   import { Vector2 } from "three";
-
+  import "smelte/src/tailwind.css";
   // local imports
   import Assets from "./components/Assets.svelte";
   import ContextMenu from "./components/menu.svelte";
-  import {dragID} from "./stores";
+  import {dragID, notification} from "./stores";
   import { AssetsAnimation } from "./ts/assetsAnimation";
   import { MainAnimation } from "./ts/mainAnimation";
   import { DragAnimation } from "./ts/dragAnimation";
@@ -84,11 +84,14 @@
         dragWrapper.style.display = "none";
       }
     });
+
   });
 
 </script>
 
+
 <main>
+
   <div 
     class="configurator" 
     on:mousemove={onMouseMove} 

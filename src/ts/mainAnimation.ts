@@ -23,9 +23,10 @@ import { Sky } from 'three/examples/jsm/objects/Sky.js';
 import { get } from 'svelte/store';
 // Local imports
 import { ThreeAnimation } from "./animation";
-import { dragID, assets, areaColor, highlightColor, wrongColor } from '../stores';
+import { dragID, assets, areaColor, highlightColor, wrongColor, notification} from '../stores';
 import { deepClone, setMeshColor, loadGLTF } from './helpers';
 import { DragState, Dragger } from './dragger';
+import { getNotificationsContext } from 'svelte-notifications';
 
 
 export class MainAnimation extends ThreeAnimation {
@@ -101,9 +102,6 @@ export class MainAnimation extends ThreeAnimation {
 
                 const dragAreas = [];
 
-                this.scene.remove(asset.mesh);
-                this.scene.remove(this.dragger.mesh);
-
                 for (let area of asset.areas) {
                     const outline = new Shape();
                     outline.moveTo(area.boundingBox.min.x, area.boundingBox.min.y);
@@ -121,6 +119,9 @@ export class MainAnimation extends ThreeAnimation {
 
                     const meshFront = new Mesh(geometry, this.emissiveFront);
                     const meshBack = new Mesh(geometry, this.emissiveBack);
+
+                    meshBack.renderOrder = 1000;
+                    meshFront.renderOrder = 1000;
 
                     const lookAt = new Matrix4().lookAt(new Vector3(0, 0, 0), area.normal, new Vector3(0, 1, 0));
 
@@ -142,18 +143,27 @@ export class MainAnimation extends ThreeAnimation {
                 this.dragger.startDrag(asset.mesh, id, dragAreas);
                 this.dragger.dragMesh(this.dragger.mesh, this.mousePosition, this.mouseOnScreen);
 
-                this.scene.add(this.dragger.mesh);
+                if (this.scene.getObjectById(asset.mesh.id) === undefined)
+                    this.scene.add(this.dragger.mesh);
+
                 this.controls.enabled = false;
             }
             else {
                 if (this.dragger.state !== DragState.DRAGGING) return;
 
-                if (this.mouseOnScreen) {
+                if (this.mouseOnScreen && this.dragger.valid) {
                     this.dragger.stopDrag();
                     this.dragger.addAsset(this.dragger.mesh);
                 }
                 else {
                     this.scene.remove(this.dragger.mesh);
+                    notification.set(
+                        {
+                            message : "Asset not placed in a valid area",
+                            type : "error",
+                        }
+                    )
+        
                 }
                 this.controls.enabled = true;
 

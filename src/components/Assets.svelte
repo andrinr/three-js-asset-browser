@@ -126,10 +126,12 @@
     height: 130px;
     margin: 10px 0px;
     transition: 0.1s;
+    border: solid 1px transparent;
   }
 
-  .item:hover {
-    text-decoration: solid underline;
+  .item:hover{
+    border: dashed 1px black;
+    border-radius: 10px;
     cursor: pointer;
   }
 
@@ -139,7 +141,7 @@
   }
 
   h2 {
-    margin: 1rem;
+    margin-top: 1rem 2rem;
     text-align: center;
   }
 </style>

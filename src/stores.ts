@@ -10,3 +10,10 @@ export const highlightColor : Readable<Color> = readable(new Color(0x0000ff));
 
 export const wrongColor : Readable<Color> = readable(new Color(0xDB5516));
 export const areaColor : Readable<Color> = readable(new Color(0x4DDB16));
+
+export interface Notification {
+    message : string;
+    type : string;
+}
+
+export const notification  : Writable<Notification> = writable(undefined);
