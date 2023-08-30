@@ -57,7 +57,8 @@ export class Dragger {
         }
         // Mouse intersects with a mesh and is pressed for the first time
         // In this case we trigger the drag
-        else if (intersectionMesh && click) {
+        else if (intersectionMesh && click && this.state !== DragState.DRAGGING) {
+            this.state = DragState.DRAGGING;
             this.mesh = intersectionMesh;
             this.scene.remove(this.mesh);
             dragID.set(this.mesh.userData['assetID']);
@@ -111,6 +112,8 @@ export class Dragger {
 
             const prevY = mesh.position.y;
             mesh.position.set(position.x, prevY, position.z);
+            mesh.position.x = Math.round(mesh.position.x);
+            mesh.position.z = Math.round(mesh.position.z);
         }
 
         const boundingBox = new Box3().setFromObject(mesh);

@@ -2,7 +2,7 @@
 import { 
     Vector3,
     DirectionalLight, 
-    AmbientLight,
+    GridHelper,
     MathUtils,
     Matrix4,
     Mesh,
@@ -45,6 +45,7 @@ export class MainAnimation extends ThreeAnimation {
     private selectedLight : PointLight;
 
     private dragger : Dragger;
+    private gridHelper : GridHelper;
 
     public constructor(
         loadedCallback : () => void
@@ -182,6 +183,13 @@ export class MainAnimation extends ThreeAnimation {
             this.click, 
             this.mouseDown, 
             this.mouseOnScreen);
+
+        if (this.dragger.state === DragState.DRAGGING) {
+            this.gridHelper.visible = true;
+        }
+        else {
+            this.gridHelper.visible = false;
+        }
         
         if (this.dragger.state !== DragState.IDLE && this.mouseOnScreen) {
             this.selectedLight.position.copy(this.dragger.mesh.position);
@@ -253,6 +261,12 @@ export class MainAnimation extends ThreeAnimation {
         this.intersectionPlane.rotateX(-Math.PI / 2);
         this.intersectionPlane.visible = false;
         this.scene.add(this.intersectionPlane);
+
+        const size = 40;
+        const divisions = 40;
+
+        this.gridHelper = new GridHelper( size, divisions );
+        this.scene.add( this.gridHelper );
 
         // const model = await loadGLTF('./models/model5.gltf');
 
