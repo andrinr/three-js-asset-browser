@@ -1,15 +1,15 @@
+
 <script lang="ts">
   import { onMount } from "svelte";
   import { watchResize } from "svelte-watch-resize";
   import { Vector2 } from "three";
-  import "smelte/src/tailwind.css";
+  import TailwindCss from './lib/TailwindCSS.svelte';
   // local imports
-  import Assets from "./components/Assets.svelte";
-  import ContextMenu from "./components/menu.svelte";
-  import {dragID, notification} from "./stores";
-  import { AssetsAnimation } from "./ts/assetsAnimation";
-  import { MainAnimation } from "./ts/mainAnimation";
-  import { DragAnimation } from "./ts/dragAnimation";
+  import Assets from "./lib/Assets.svelte";
+  import { dragID } from "./lib/ts/stores";
+  import { AssetsAnimation } from "./lib/ts/assetsAnimation";
+  import { MainAnimation } from "./lib/ts/mainAnimation";
+  import { DragAnimation } from "./lib/ts/dragAnimation";
 
   let mainAnimation: MainAnimation;
   let assetsAnimation : AssetsAnimation;
@@ -27,12 +27,18 @@
   const setCanvasDrag = () => {
     const dragWrapper = document.getElementById("wrapper-drag");
 
+    if (!dragWrapper)
+      return;
+
     const rect = dragWrapper.getBoundingClientRect();
     
     dragWrapper.style.left = `${mousePos.x - rect.width / 2}px`;
     dragWrapper.style.top = `${mousePos.y - rect.height / 2}px`;
 
-    const wrapperViewer: HTMLElement = document.getElementById("wrapper-viewer");
+    const wrapperViewer = document.getElementById("wrapper-viewer");
+    if (!wrapperViewer)
+      return;
+
     const rectViewer = wrapperViewer.getBoundingClientRect();
     
     const inside = 
@@ -49,7 +55,7 @@
     }
   }
 
-  const onMouseMove = (event) => {
+  const onMouseMove = (event : MouseEvent) => {
 
     mousePos.set(event.clientX, event.clientY);
 
@@ -76,11 +82,15 @@
     dragID.subscribe((id) => {
       if (id !== -1) {
         const dragWrapper = document.getElementById("wrapper-drag");
+        if (!dragWrapper)
+          return;
         dragWrapper.style.display = "block";
         setCanvasDrag();
       }
       else {
         const dragWrapper = document.getElementById("wrapper-drag");
+        if (!dragWrapper)
+          return;
         dragWrapper.style.display = "none";
       }
     });
@@ -89,7 +99,7 @@
 
 </script>
 
-
+<TailwindCss/>
 <main>
 
   <div 
@@ -128,7 +138,6 @@
       <Assets/>   
     </div>
   </div>
-  <ContextMenu/>
 </main>
 
 <svelte:window/>
