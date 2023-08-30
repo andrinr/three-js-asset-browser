@@ -85,7 +85,6 @@ export class Dragger {
 
     public stopDrag() {
         this.state = DragState.SELECTED;
-        this.unselect(this.mesh);
     }
 
     public dragMesh(mesh : Mesh, mousePosition : Vector2, mouseOnScreen : boolean) {

@@ -124,6 +124,7 @@
     flex-basis: 130px;
     flex-grow: 1;
     height: 130px;
+    padding: 0;
     margin: 10px 0px;
     transition: 0.1s;
     border: solid 1px transparent;

@@ -184,7 +184,6 @@ export class MainAnimation extends ThreeAnimation {
             this.mouseOnScreen);
         
         if (this.dragger.state !== DragState.IDLE && this.mouseOnScreen) {
-            console.log(this.dragger.state);
             this.selectedLight.position.copy(this.dragger.mesh.position);
             this.selectedLight.intensity = 1.0;
             this.selectedLight.color = this.dragger.valid ? get(highlightColor) : get(wrongColor);

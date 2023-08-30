@@ -23,29 +23,40 @@ export function highlight(mesh : Mesh, valid : boolean) {
         }
     ));
 
-    if (mesh.userData['highlighted'])
+    console.log("select")
+    console.log(mesh.userData['assetID'])
+    console.log(mesh.userData['previousMaterial'])
+
+    if (mesh.userData['previousMaterial'])
         return;
     
     mesh.userData['previousMaterial'] = previousMaterial;
-    mesh.userData['highlighted'] = true;
 
 }
 
 export function unhighlight(mesh : Mesh) {
-    if (!mesh.userData['highlighted'])
+
+    console.log("unselect")
+    console.log(mesh.userData['assetID'])
+    console.log(mesh.userData['previousMaterial'])
+
+    if (!mesh.userData['previousMaterial'])
         return;
 
     mesh.renderOrder = 0;
     setMeshMaterial(mesh, mesh.userData['previousMaterial']);
-    mesh.userData['highlighted'] = false;
 }
 
 export function deepClone(mesh : Mesh) : Mesh{
     if (mesh.material instanceof Array) {
-        return new Mesh(mesh.geometry.clone(), mesh.material[0].clone());
+        const clone =  new Mesh(mesh.geometry.clone(), mesh.material[0].clone());
+        clone.userData['previousMaterial'] = mesh.userData['previousMaterial'];
+        return clone;
     }
     else {
-        return new Mesh(mesh.geometry.clone(), mesh.material.clone());
+        const clone = new Mesh(mesh.geometry.clone(), mesh.material.clone());
+        clone.userData['previousMaterial'] = mesh.userData['previousMaterial'];
+        return clone;
     }
 }
 
