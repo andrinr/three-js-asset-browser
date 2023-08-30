@@ -10,7 +10,7 @@ import {
     BackSide,
     Shape,
     HemisphereLight,
-    DirectionalLightHelper,
+    AxesHelper,
     MeshPhongMaterial,
     PlaneGeometry,
     ShapeGeometry,
@@ -46,6 +46,7 @@ export class MainAnimation extends ThreeAnimation {
 
     private dragger : Dragger;
     private gridHelper : GridHelper;
+    private axesHelper : AxesHelper;
 
     public constructor(
         loadedCallback : () => void
@@ -186,9 +187,11 @@ export class MainAnimation extends ThreeAnimation {
 
         if (this.dragger.state === DragState.DRAGGING) {
             this.gridHelper.visible = true;
+            this.axesHelper.visible = true;
         }
         else {
             this.gridHelper.visible = false;
+            this.axesHelper.visible = false;
         }
         
         if (this.dragger.state !== DragState.IDLE && this.mouseOnScreen) {
@@ -267,6 +270,9 @@ export class MainAnimation extends ThreeAnimation {
 
         this.gridHelper = new GridHelper( size, divisions );
         this.scene.add( this.gridHelper );
+
+        this.axesHelper = new AxesHelper( 5 );
+        this.scene.add( this.axesHelper );
 
         // const model = await loadGLTF('./models/model5.gltf');
 
