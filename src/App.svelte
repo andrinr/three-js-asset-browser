@@ -4,6 +4,7 @@
   import { watchResize } from "svelte-watch-resize";
   import { Vector2 } from "three";
   import TailwindCss from './lib/TailwindCSS.svelte';
+  import { Alert } from 'flowbite-svelte';
   // local imports
   import Assets from "./lib/Assets.svelte";
   import { dragID } from "./lib/ts/stores";
@@ -101,7 +102,10 @@
 
 <TailwindCss/>
 <main>
-
+  <Alert>
+    <span class="font-medium">Default alert!</span>
+    Change a few things up and try submitting again.
+  </Alert>
   <div 
     class="configurator" 
     on:mousemove={onMouseMove} 

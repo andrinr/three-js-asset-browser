@@ -1,6 +1,7 @@
 <script lang="ts">
     import { watchResize } from "svelte-watch-resize";
     import { Mesh, BoxGeometry, MeshPhongMaterial, SphereGeometry, Vector3, Vector2 } from "three";
+    import { Card } from 'flowbite-svelte';
   
     // local imports
     import { dragID, assets } from './ts/stores';
@@ -117,7 +118,7 @@
       flex-wrap: wrap;
       justify-content: center;
       align-items: flex-start;
-      margin: 10px;
+      margin: 0px;
     }
   
     .item {

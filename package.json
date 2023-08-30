@@ -23,6 +23,8 @@
   },
   "dependencies": {
     "@types/three": "^0.155.1",
+    "flowbite": "^1.8.1",
+    "flowbite-svelte": "^0.44.4",
     "postprocessing": "^6.33.0",
     "svelte-watch-resize": "^1.0.3",
     "three": "^0.155.0"
