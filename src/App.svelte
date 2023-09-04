@@ -9,7 +9,7 @@
   import { AssetsAnimation } from "./ts/assetsAnimation";
   import { MainAnimation } from "./ts/mainAnimation";
   import { DragAnimation } from "./ts/dragAnimation";
-  import Notification from "./components/Notification.svelte";
+  import Notifications from "./components/Notifications.svelte";
 
   let mainAnimation: MainAnimation;
   let assetsAnimation : AssetsAnimation;
@@ -90,7 +90,7 @@
 </script>
 
 <main>
-  <Notification/>
+  <Notifications/>
   <div 
     class="configurator" 
     on:mousemove={onMouseMove} 

@@ -1,62 +1,50 @@
+
 <script lang="ts">
-  import { onMount } from "svelte";
-  import { notification } from "../stores";
-
-  let notifications : HTMLElement;
-  let id : number = 0;
-
-  onMount(() => {
-    notification.subscribe((value) => {
-      id += 1;
-      const notification = document.createElement("div");
-      notification.id = `notification-${id}`;
-      notification.className = "notification";
-
-      const text = document.createElement("p");
-      text.innerHTML = value.message;
-
-      notification.appendChild(text);
-
-      notifications.appendChild(notification);
-
-      const interval = setInterval(() => {
-        notifications.removeChild(notification);
-        clearInterval(interval);
-      }, 10000);
-    });
-  });
-
-  
+    import { NotificationType } from "../stores";
+    import { fade, fly } from 'svelte/transition';
+    
+    export let message : string;
+    export let type : NotificationType;
 </script>
-  
 
-<div id="notifications" bind:this={notifications} class="notifications">
-  <div class="notification">
-
-  </div>
-
+<div class="notification"  out:fade in:fade>
+    <p>{message}</p>
+    {#if type === NotificationType.ERROR}
+        <div class="bar error"></div>
+    {:else if type === NotificationType.SUCCESS}
+        <div class="bar success"></div>
+    {:else if type === NotificationType.INFO}
+        <div class="bar info"></div>
+    {/if}
 </div>
 
 <style>
+    .notification { 
+        z-index: 200;
+        background-color: var(--black);
+        margin: 10px;
+        width: 200px;
+        color: var(--white);
+    }
 
-  .notifications {
-    display: flex;
-    flex-direction: column;
-    z-index: 200;
-    position: absolute;
-    top: 0;
-    left: 0;
+    .bar {
+        height: 5px;
+    }
 
-  }
-  
-  .notification { 
-      z-index: 200;
-      background-color: var(--white);
-      border-radius: 10px;
-  }
+    .error {
+        background-color: var(--color-2);
+    }
 
-  @media screen and (orientation: portrait) {
-    
-  }
+    .info {
+        background-color: var(--color-1);
+    }
+
+    .success {
+        background-color: var(--color-3);
+    }
+
+    p {
+        margin: 10px 20px;
+    }
+
 </style>
-  

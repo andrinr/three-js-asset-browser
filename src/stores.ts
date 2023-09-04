@@ -18,14 +18,14 @@ export enum NotificationType {
     INFO,
 }
 
-export interface Notification {
+export interface NotificationInstance {
     message : string;
     type : NotificationType;
+    id? : number;
 }
 
-export const notification  : Writable<Notification> = writable(
-    {
-        message: "",
-        type: NotificationType.SUCCESS,
-    }
-);
+export const notification  : Writable<NotificationInstance> = writable({
+    message: "",
+    type: NotificationType.INFO,
+    id: 0,
+});

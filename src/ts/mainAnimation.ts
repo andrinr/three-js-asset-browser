@@ -156,6 +156,12 @@ export class MainAnimation extends ThreeAnimation {
                 if (this.mouseOnScreen && this.dragger.valid) {
                     this.dragger.stopDrag();
                     this.dragger.addAsset(this.dragger.mesh);
+                    notification.set(
+                        {
+                            message : "New asset placed",
+                            type : NotificationType.SUCCESS,
+                        }
+                    )
                 }
                 else {
                     this.scene.remove(this.dragger.mesh);
