@@ -31,7 +31,7 @@
     assets.update( items => {
       items.push(
         {
-          name : 'Asset Name',
+          name : 'CUBE',
           mesh : mesh,
           areas : [floor],
           focused : false,
@@ -117,22 +117,24 @@
     flex-wrap: wrap;
     justify-content: center;
     align-items: flex-start;
-    margin: 10px;
+    margin: 20px;
   }
 
   .item {
-    flex-basis: 130px;
+    flex-basis: 150px;
     flex-grow: 1;
-    height: 130px;
-    margin: 5px 5px;
+    height: 150px;
+    margin: 10px;
     transition: 0.1s;
-    border: solid 1px var(--white-1);
-    border-radius: 5px;
+    background-color: var(--primary-1);
+
+    border-radius: 20px;
+    font-weight: bold;
+    color: var(--black-1)
   }
 
   .item:hover{
     cursor: pointer;
-    box-shadow: 0 0 10px var(--white-2);
   }
 
   p{
@@ -143,6 +145,7 @@
   h2 {
     margin-top: 2rem;
     margin-bottom: 0rem;
-    text-align: center;
+    margin-left: 2rem;
+    color: var(--black-1)
   }
 </style>

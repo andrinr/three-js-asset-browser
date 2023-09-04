@@ -127,8 +127,11 @@
     <div id="assets-html" class="assets">
       <Assets/>   
     </div>
+
+    <div id="impatct" class="impact">
+      
+    </div>
   </div>
-  <ContextMenu/>
 </main>
 
 <svelte:window/>
@@ -145,24 +148,31 @@
 
   .viewer {
     position: absolute;
-    width: 70%;
+    width: 50%;
     height: 100%;
-    left: 0;
+    left: 25%;
     top: 0;
   }
 
   .assets {
     position: absolute;
-    width: 30%;
+    width: 25%;
     height: 100%;
     right: 0;
+    top: 0;
+  }
+
+  .impact {
+    position: absolute;
+    width: 25%;
+    height: 100%;
+    left: 0;
     top: 0;
   }
 
   #wrapper-assets {
     pointer-events: none;
     z-index: 5;
-    border-left: solid 1px var(--white-1);
   }
 
   #assets-html {
@@ -171,6 +181,7 @@
     color: black;
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
+    background-color: var(--white-0);
   }
 
   #assets-html::-webkit-scrollbar {

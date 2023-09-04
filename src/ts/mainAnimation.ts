@@ -250,7 +250,7 @@ export class MainAnimation extends ThreeAnimation {
 
 	private async addModels() {
 
-        const planeY = -1;
+        const planeY = 0;
         const floor = new PlaneGeometry(2000, 2000, 8, 8);
         const floorMesh = new Mesh(floor, new MeshPhongMaterial({color: 0xffffff}));
         this.floorPlane = floorMesh;
@@ -274,10 +274,11 @@ export class MainAnimation extends ThreeAnimation {
         this.axesHelper = new AxesHelper( 5 );
         this.scene.add( this.axesHelper );
 
-        // const model = await loadGLTF('./models/model5.gltf');
-
-        // this.scene.add(model);
-        // model.scale.setScalar(0.1);
+        const model = await loadGLTF('./models/model7.gltf');
+        model.castShadow = true;
+        model.receiveShadow = true;
+        this.scene.add(model);
+        model.scale.setScalar(0.1);
 
         setTimeout(() => {
             this.loadedCallback();
