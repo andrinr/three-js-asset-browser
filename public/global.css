@@ -1,19 +1,9 @@
 :root {
-	--white-0: #ffffff;
-	--white-1: #cecece;
-	--white-2: #b4b4b4;
-	--black-0: #000000;
-	--black-1: #1a1a1a;
-	--black-2: #333333;
-	--grey-0: #444444;
-	--grey-1: #787878;
-	--grey-2: #878787;
-	--primary: #0000ff;
-	--primary-0: #3a3aa7;
-	--primary-1: #c8c8e4;
-	--primary-2: #e4e4f2;
-	--secondary: #DB5516;
-	--tertiary: #4DDB16;
+	--white: #f2f2f2;
+	--black : #333333;
+	--color-1: #0000ff;
+	--color-2: #DB5516;
+	--color-3: #33e678;
 }
   
   html, body {

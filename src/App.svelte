@@ -5,11 +5,11 @@
   import "smelte/src/tailwind.css";
   // local imports
   import Assets from "./components/Assets.svelte";
-  import ContextMenu from "./components/menu.svelte";
   import {dragID, notification} from "./stores";
   import { AssetsAnimation } from "./ts/assetsAnimation";
   import { MainAnimation } from "./ts/mainAnimation";
   import { DragAnimation } from "./ts/dragAnimation";
+  import Notification from "./components/Notification.svelte";
 
   let mainAnimation: MainAnimation;
   let assetsAnimation : AssetsAnimation;
@@ -89,9 +89,8 @@
 
 </script>
 
-
 <main>
-
+  <Notification/>
   <div 
     class="configurator" 
     on:mousemove={onMouseMove} 
@@ -178,10 +177,10 @@
   #assets-html {
     z-index: 2;
     overflow-y: scroll;
-    color: black;
+    color: var(--black);;
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
-    background-color: var(--white-0);
+    background-color: var(--white);
   }
 
   #assets-html::-webkit-scrollbar {

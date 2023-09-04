@@ -9,11 +9,23 @@ export const assets : Writable<AssetInstance[]> = writable([]);
 export const highlightColor : Readable<Color> = readable(new Color(0x0000ff));
 
 export const wrongColor : Readable<Color> = readable(new Color(0xDB5516));
-export const areaColor : Readable<Color> = readable(new Color(0x4DDB16));
+export const areaColor : Readable<Color> = readable(new Color(0x33e678));
+
+export enum NotificationType {
+    SUCCESS,
+    ERROR,
+    WARNING,
+    INFO,
+}
 
 export interface Notification {
     message : string;
-    type : string;
+    type : NotificationType;
 }
 
-export const notification  : Writable<Notification> = writable(undefined);
+export const notification  : Writable<Notification> = writable(
+    {
+        message: "",
+        type: NotificationType.SUCCESS,
+    }
+);

@@ -78,7 +78,7 @@
 </script>
 
 <div class="assets">
-  <h2>Assets:</h2>
+  <h2>Assets</h2>
   <br>
   <div class="container" on:wheel={update} use:watchResize={update} bind:this={assetsHtml} >
   
@@ -132,20 +132,19 @@
   }
 
   .item {
-    flex-basis: 150px;
+    flex-basis: 130px;
     flex-grow: 1;
-    height: 150px;
+    height: 130px;
     margin: 10px;
     transition: 0.1s;
-    background-color: var(--primary-1);
-
-    border-radius: 20px;
     font-weight: bold;
-    color: var(--black-1)
+    color: var(--black-1);
+    border: solid 1px transparent;
   }
 
   .item:hover{
     cursor: pointer;
+    border: solid 1px var(--black);
   }
 
   p{
@@ -154,6 +153,7 @@
   }
 
   h2 {
+    font-size: 3rem;
     margin-top: 2rem;
     margin-bottom: 0rem;
     margin-left: 2rem;

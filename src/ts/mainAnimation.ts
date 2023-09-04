@@ -23,7 +23,7 @@ import { Sky } from 'three/examples/jsm/objects/Sky.js';
 import { get } from 'svelte/store';
 // Local imports
 import { ThreeAnimation } from "./animation";
-import { dragID, assets, areaColor, highlightColor, wrongColor, notification} from '../stores';
+import { dragID, assets, areaColor, highlightColor, wrongColor, notification, NotificationType} from '../stores';
 import { deepClone, setMeshColor, loadGLTF } from './helpers';
 import { DragState, Dragger } from './dragger';
 import { getNotificationsContext } from 'svelte-notifications';
@@ -162,10 +162,9 @@ export class MainAnimation extends ThreeAnimation {
                     notification.set(
                         {
                             message : "Asset not placed in a valid area",
-                            type : "error",
+                            type : NotificationType.ERROR,
                         }
                     )
-        
                 }
                 this.controls.enabled = true;
 
@@ -265,8 +264,8 @@ export class MainAnimation extends ThreeAnimation {
         this.intersectionPlane.visible = false;
         this.scene.add(this.intersectionPlane);
 
-        const size = 40;
-        const divisions = 40;
+        const size = 100;
+        const divisions = 100;
 
         this.gridHelper = new GridHelper( size, divisions );
         this.scene.add( this.gridHelper );
