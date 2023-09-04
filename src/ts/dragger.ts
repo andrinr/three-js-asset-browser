@@ -61,6 +61,7 @@ export class Dragger {
             this.state = DragState.DRAGGING;
             this.mesh = intersectionMesh;
             this.scene.remove(this.mesh);
+            this.selectables.splice(this.selectables.indexOf(this.mesh), 1);
             dragID.set(this.mesh.userData['assetID']);
         }
         // Mouse is still pressed and dragging the mesh

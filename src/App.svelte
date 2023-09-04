@@ -128,9 +128,9 @@
       <Assets/>   
     </div>
 
-    <div id="impatct" class="impact">
+    <!-- <div id="impatct" class="impact">
       
-    </div>
+    </div> -->
   </div>
 </main>
 
@@ -148,9 +148,9 @@
 
   .viewer {
     position: absolute;
-    width: 50%;
+    width: 75%;
     height: 100%;
-    left: 25%;
+    left: 0;
     top: 0;
   }
 

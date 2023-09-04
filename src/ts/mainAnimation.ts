@@ -187,7 +187,7 @@ export class MainAnimation extends ThreeAnimation {
 
         if (this.dragger.state === DragState.DRAGGING) {
             this.gridHelper.visible = true;
-            this.axesHelper.visible = true;
+            // this.axesHelper.visible = true;
         }
         else {
             this.gridHelper.visible = false;
@@ -278,7 +278,7 @@ export class MainAnimation extends ThreeAnimation {
         model.castShadow = true;
         model.receiveShadow = true;
         this.scene.add(model);
-        model.scale.setScalar(0.1);
+        model.scale.setScalar(0.3);
 
         setTimeout(() => {
             this.loadedCallback();
