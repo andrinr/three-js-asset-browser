@@ -19,21 +19,32 @@
 
     mesh.rotateX(Math.PI / 4);
 
-    const floor : Area = {
+    const floor1 : Area = {
       name : 'floor',
       normal : new Vector3(0, 1, 0),
       boundingBox : {
-        min : new Vector2(-5, -5),
+        min : new Vector2(-5, 0),
         max : new Vector2(5, 5)
       },
     }
+
+    const floor2 : Area = {
+      name : 'floor2',
+      normal : new Vector3(0, 1, 0),
+      boundingBox : {
+        min : new Vector2(-5, -5),
+        max : new Vector2(0, 0)
+      },
+    }
+
+    
 
     assets.update( items => {
       items.push(
         {
           name : 'CUBE',
           mesh : mesh,
-          areas : [floor],
+          areas : [floor1, floor2],
           focused : false,
           visible : true,
           viewerPosition : new Vector2(0, 0),

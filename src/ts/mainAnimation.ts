@@ -67,8 +67,8 @@ export class MainAnimation extends ThreeAnimation {
         this.camera.lookAt(new Vector3(0,0,0));
         this.controls.maxDistance = 30 * this.scale ;
         this.controls.minDistance = 3 * this.scale ;
-        this.controls.maxPolarAngle = Math.PI / 2;
-        this.controls.minPolarAngle = Math.PI / 6;
+        this.controls.maxPolarAngle = Math.PI / 2 - Math.PI / 20;
+        this.controls.minPolarAngle = Math.PI / 20;
     
         this.sunPosition = new Vector3(0, 0, 0);
         const phi : number = MathUtils.degToRad( 90 - 20 );
@@ -260,7 +260,7 @@ export class MainAnimation extends ThreeAnimation {
         this.scene.add(floorMesh);
 
         this.intersectionPlane = new Mesh(new PlaneGeometry(2000, 2000, 8, 8), new MeshPhongMaterial({color: 0x999999}));
-        this.intersectionPlane.position.set(0, 0, 0);
+        this.intersectionPlane.position.set(0, 0.25, 0);
         this.intersectionPlane.rotateX(-Math.PI / 2);
         this.intersectionPlane.visible = false;
         this.scene.add(this.intersectionPlane);

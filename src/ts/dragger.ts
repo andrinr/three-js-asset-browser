@@ -112,9 +112,9 @@ export class Dragger {
             const position = intersection.point;
 
             const prevY = mesh.position.y;
-            mesh.position.set(position.x, prevY, position.z);
-            mesh.position.x = Math.round(mesh.position.x);
-            mesh.position.z = Math.round(mesh.position.z);
+            mesh.position.set(position.x, position.y, position.z);
+            mesh.position.x = Math.round(mesh.position.x + 0.5) - 0.5;
+            mesh.position.z = Math.round(mesh.position.z + 0.5) - 0.5;
         }
 
         const boundingBox = new Box3().setFromObject(mesh);
