@@ -13,11 +13,11 @@ import {
     AxesHelper,
     MeshPhongMaterial,
     PlaneGeometry,
-    ShapeGeometry,
-    Color,
     FrontSide,
     MeshStandardMaterial,
     PointLight} from 'three';
+
+import * as THREE from 'three';
 
 import { Sky } from 'three/examples/jsm/objects/Sky.js';
 import { get } from 'svelte/store';
@@ -47,6 +47,8 @@ export class MainAnimation extends ThreeAnimation {
     private dragger : Dragger;
     private gridHelper : GridHelper;
     private axesHelper : AxesHelper;
+
+    private tilesRenderer : any;
 
     public constructor(
         loadedCallback : () => void
@@ -284,6 +286,14 @@ export class MainAnimation extends ThreeAnimation {
         model.receiveShadow = true;
         this.scene.add(model);
         model.scale.setScalar(0.3);
+
+
+        this.tilesRenderer = await Nomoko.loadTile(
+            "pub.OTFjOWU3ZjQtYWYwNi00MWNmLWFjNDAtNmRkNjA5MWZkNTdl.YSLcB8UuL0",
+            "https://assets.platform.nomoko.world/u/a6fb8866/result_root_ext_tileset.json",
+            this.renderer,
+            this.camera
+        );
 
         setTimeout(() => {
             this.loadedCallback();

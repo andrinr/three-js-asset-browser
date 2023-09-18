@@ -7,7 +7,7 @@
     export let type : NotificationType;
 </script>
 
-<div class="notification"  out:fade in:fade>
+<div class="notification"  out:fly={{y: -100, duration: 500}} in:fly={{y: 100, duration: 500}}>
     <p>{message}</p>
     {#if type === NotificationType.ERROR}
         <div class="bar error"></div>
@@ -25,6 +25,9 @@
         margin: 10px;
         width: 200px;
         color: var(--white);
+        transition: all 0.5s ease-in-out;
+        border-radius: 5px;
+        overflow: hidden;
     }
 
     .bar {

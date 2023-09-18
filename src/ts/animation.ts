@@ -12,7 +12,6 @@ import {
     
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js';
 import { setMeshColor } from "./helpers";
-import { EffectComposer } from "postprocessing";
 
 export abstract class ThreeAnimation {
     
@@ -40,7 +39,6 @@ export abstract class ThreeAnimation {
     protected selectionMode : boolean;
     protected posProcessingMode : boolean;
 
-    protected composer : EffectComposer;
 
     constructor(
         orthographicMode : boolean = false,
@@ -118,9 +116,6 @@ export abstract class ThreeAnimation {
         
         if (this.orbitMode)
             this.controls = new OrbitControls( this.camera, this.renderer.domElement );
-        
-        if (this.posProcessingMode) 
-            this.composer = new EffectComposer(this.renderer);
         
         
         this.init();
