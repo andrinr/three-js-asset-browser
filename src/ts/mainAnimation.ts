@@ -209,6 +209,9 @@ export class MainAnimation extends ThreeAnimation {
         else {
             this.selectedLight.intensity = 0.0;
         }
+
+        if (this.tilesRenderer) 
+            this.tilesRenderer.update();
     }
 
 	private addSky () {

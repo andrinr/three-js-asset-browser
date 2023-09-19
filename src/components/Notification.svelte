@@ -7,7 +7,7 @@
     export let type : NotificationType;
 </script>
 
-<div class="notification"  out:fly={{y: -100, duration: 500}} in:fly={{y: 100, duration: 500}}>
+<div class="notification">
     <p>{message}</p>
     {#if type === NotificationType.ERROR}
         <div class="bar error"></div>
