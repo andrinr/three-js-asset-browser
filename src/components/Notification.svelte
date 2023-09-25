@@ -1,7 +1,6 @@
 
 <script lang="ts">
     import { NotificationType } from "../stores";
-    import { fade, fly } from 'svelte/transition';
     
     export let message : string;
     export let type : NotificationType;

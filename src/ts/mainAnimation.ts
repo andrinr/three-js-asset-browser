@@ -67,8 +67,8 @@ export class MainAnimation extends ThreeAnimation {
 
         this.camera.position.set(0, 15, 10);
         this.camera.lookAt(new Vector3(0,0,0));
-        this.controls.maxDistance = 30 * this.scale ;
-        this.controls.minDistance = 3 * this.scale ;
+        // this.controls.maxDistance = 30 * this.scale ;
+        // this.controls.minDistance = 3 * this.scale ;
         this.controls.maxPolarAngle = Math.PI / 2 - Math.PI / 20;
         this.controls.minPolarAngle = Math.PI / 20;
     
@@ -284,11 +284,11 @@ export class MainAnimation extends ThreeAnimation {
         this.axesHelper = new AxesHelper( 5 );
         this.scene.add( this.axesHelper );
 
-        const model = await loadGLTF('./models/model7.gltf');
-        model.castShadow = true;
-        model.receiveShadow = true;
-        this.scene.add(model);
-        model.scale.setScalar(0.3);
+        // const model = await loadGLTF('./models/model7.gltf');
+        // model.castShadow = true;
+        // model.receiveShadow = true;
+        // this.scene.add(model);
+        // model.scale.setScalar(0.3);
 
 
         this.tilesRenderer = await Nomoko.loadTile(
@@ -297,6 +297,16 @@ export class MainAnimation extends ThreeAnimation {
             this.renderer,
             this.camera
         );
+
+        console.log("Tiles loaded");
+        console.log(this.tilesRenderer);
+
+        this.tilesRenderer.group.rotation.x = -Math.PI / 2;
+        this.tilesRenderer.group.scale.setScalar(0.1);
+        this.tilesRenderer.group.position.set(0, -30, 0);
+        this.tilesRenderer.group.receiveShadow = true;
+        this.scene.add(this.tilesRenderer.group);
+    
 
         setTimeout(() => {
             this.loadedCallback();
