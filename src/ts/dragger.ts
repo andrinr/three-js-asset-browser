@@ -5,9 +5,9 @@ import {
     Raycaster,
     Vector2,
     Box3,
-    Color,
-    Scene} from "three";
-import { deepClone, highlight, setMeshMaterialProperties, unhighlight } from "./helpers";
+    Scene,
+    Object3D} from "three";
+import {deepCloneObject, highlightObject, unhighlightObject } from "./helpers";
 
 import { dragID } from '../stores';
 
@@ -18,13 +18,13 @@ export enum DragState {
 }
 
 export class Dragger {
-    private selectables : Mesh[];
+    private selectables : Object3D[];
     private raycaster : Raycaster;
     private camera : PerspectiveCamera | OrthographicCamera;
     private scene : Scene;
 
     public state : DragState;
-    public mesh : Mesh;
+    public object : Object3D;
     public areas : Mesh[];
     private intersectionPlane : Mesh;
     public valid : boolean;
@@ -52,40 +52,40 @@ export class Dragger {
         // In this case we highlight the mesh
         if (intersectionMesh && !click && this.state === DragState.IDLE) {
             this.select(intersectionMesh);
-            this.mesh = intersectionMesh;
+            this.object = intersectionMesh;
             this.state = DragState.SELECTED;
         }
         // Mouse intersects with a mesh and is pressed for the first time
         // In this case we trigger the drag
         else if (intersectionMesh && click && this.state !== DragState.DRAGGING) {
             this.state = DragState.DRAGGING;
-            this.mesh = intersectionMesh;
-            this.scene.remove(this.mesh);
-            this.selectables.splice(this.selectables.indexOf(this.mesh), 1);
-            dragID.set(this.mesh.userData['assetID']);
+            this.object = intersectionMesh;
+            this.scene.remove(this.object);
+            this.selectables.splice(this.selectables.indexOf(this.object), 1);
+            dragID.set(this.object.userData['assetID']);
         }
         // Mouse is still pressed and dragging the mesh
         // In this case we simply update the mesh position
         else if (this.state === DragState.DRAGGING) {
-            this.dragMesh(this.mesh, mousePosition, mouseOnScreen);
+            this.dragMesh(this.object, mousePosition, mouseOnScreen);
         }
-        else if (!intersectionMesh && this.mesh) {
-            this.unselect(this.mesh);
+        else if (!intersectionMesh && this.object) {
+            this.unselect(this.object);
             this.state = DragState.IDLE;
         }
         
     }
 
-    public startDrag(mesh : Mesh, id : number, areas : Mesh[]) {
-        this.mesh = deepClone(mesh);
-        this.mesh.userData['assetID'] = id;
-        this.mesh.castShadow = true;
-        this.mesh.receiveShadow = true;
+    public startDrag(object : Object3D, id : number, areas : Mesh[]) {
+        this.object = deepCloneObject(object);
+        this.object.userData['assetID'] = id;
+        this.object.castShadow = true;
+        this.object.receiveShadow = true;
         this.state = DragState.DRAGGING;
 
         console.log("Start drag");
 
-        this.select(this.mesh);
+        this.select(this.object);
 
         this.areas = areas;
     }
@@ -94,13 +94,13 @@ export class Dragger {
         this.state = DragState.SELECTED;
     }
 
-    public dragMesh(mesh : Mesh, mousePosition : Vector2, mouseOnScreen : boolean) {
-        this.mesh = mesh;
+    public dragMesh(object : Object3D, mousePosition : Vector2, mouseOnScreen : boolean) {
+        this.object = object;
         if (!mouseOnScreen) {
-            mesh.visible = false;
+            object.visible = false;
         }
         else {
-            mesh.visible = true;
+            object.visible = true;
         }
 
         this.raycaster.setFromCamera(mousePosition, this.camera);
@@ -111,13 +111,13 @@ export class Dragger {
 
             const position = intersection.point;
 
-            const prevY = mesh.position.y;
-            mesh.position.set(position.x, position.y, position.z);
-            mesh.position.x = Math.round(mesh.position.x + 0.5) - 0.5;
-            mesh.position.z = Math.round(mesh.position.z + 0.5) - 0.5;
+            const prevY = object.position.y;
+            object.position.set(position.x, position.y, position.z);
+            object.position.x = Math.round(object.position.x + 0.5) - 0.5;
+            object.position.z = Math.round(object.position.z + 0.5) - 0.5;
         }
 
-        const boundingBox = new Box3().setFromObject(mesh);
+        const boundingBox = new Box3().setFromObject(object);
         let intersect = false;
         for (let area of this.areas) {
             const areaBoundingBox = new Box3().setFromObject(area);
@@ -130,21 +130,21 @@ export class Dragger {
 
         if (!intersect) {
             this.valid = false;
-            highlight(mesh, false);
+            highlightObject(object, false);
         }
         else {
             this.valid = true;
-            highlight(mesh, true);
+            highlightObject(object, true);
         }
     }
 
-    private getIntersectedMesh(mousePosition : Vector2) : Mesh | undefined {
+    private getIntersectedMesh(mousePosition : Vector2) : Object3D | undefined {
         this.raycaster.setFromCamera(mousePosition, this.camera);
         const intersects = this.raycaster.intersectObjects(this.selectables);
 
         if (intersects.length > 0) {
             const intersect = intersects[0];
-            const mesh = intersect.object as Mesh;
+            const mesh = intersect.object as Object3D;
 
             return mesh;
         }
@@ -152,15 +152,15 @@ export class Dragger {
         return undefined;
     }
 
-    public select(mesh : Mesh) {
-        highlight(mesh, true);
+    public select(object : Object3D) {
+        highlightObject(object, true);
     }
 
-    public unselect(mesh : Mesh) {      
-        unhighlight(mesh);
+    public unselect(object : Object3D) {      
+        unhighlightObject(object);
     }
 
-    public addAsset(asset : Mesh) {
+    public addAsset(asset : Object3D) {
         this.selectables.push(asset);
     }
 

@@ -17,17 +17,13 @@ import {
     MeshStandardMaterial,
     PointLight} from 'three';
 
-import * as THREE from 'three';
-
 import { Sky } from 'three/examples/jsm/objects/Sky.js';
 import { get } from 'svelte/store';
 // Local imports
 import { ThreeAnimation } from "./animation";
 import { dragID, assets, areaColor, highlightColor, wrongColor, notification, NotificationType} from '../stores';
-import { deepClone, setMeshColor, loadGLTF } from './helpers';
+import { loadGLTF } from './helpers';
 import { DragState, Dragger } from './dragger';
-import { getNotificationsContext } from 'svelte-notifications';
-
 
 export class MainAnimation extends ThreeAnimation {
 
@@ -67,8 +63,8 @@ export class MainAnimation extends ThreeAnimation {
 
         this.camera.position.set(0, 15, 10);
         this.camera.lookAt(new Vector3(0,0,0));
-        // this.controls.maxDistance = 30 * this.scale ;
-        // this.controls.minDistance = 3 * this.scale ;
+        this.controls.maxDistance = 60 * this.scale ;
+        this.controls.minDistance = 3 * this.scale ;
         this.controls.maxPolarAngle = Math.PI / 2 - Math.PI / 20;
         this.controls.minPolarAngle = Math.PI / 20;
     
@@ -144,11 +140,11 @@ export class MainAnimation extends ThreeAnimation {
                     dragAreas.push(meshBack);
                 }
 
-                this.dragger.startDrag(asset.mesh, id, dragAreas);
-                this.dragger.dragMesh(this.dragger.mesh, this.mousePosition, this.mouseOnScreen);
+                this.dragger.startDrag(asset.group, id, dragAreas);
+                this.dragger.dragMesh(this.dragger.object, this.mousePosition, this.mouseOnScreen);
 
-                if (this.scene.getObjectById(asset.mesh.id) === undefined)
-                    this.scene.add(this.dragger.mesh);
+                if (this.scene.getObjectById(asset.group.id) === undefined)
+                    this.scene.add(this.dragger.object);
 
                 this.controls.enabled = false;
             }
@@ -157,7 +153,7 @@ export class MainAnimation extends ThreeAnimation {
 
                 if (this.mouseOnScreen && this.dragger.valid) {
                     this.dragger.stopDrag();
-                    this.dragger.addAsset(this.dragger.mesh);
+                    this.dragger.addAsset(this.dragger.object);
                     notification.set(
                         {
                             message : "New asset placed",
@@ -166,7 +162,7 @@ export class MainAnimation extends ThreeAnimation {
                     )
                 }
                 else {
-                    this.scene.remove(this.dragger.mesh);
+                    this.scene.remove(this.dragger.object);
                     notification.set(
                         {
                             message : "Asset not placed in a valid area",
@@ -194,7 +190,7 @@ export class MainAnimation extends ThreeAnimation {
 
         if (this.dragger.state === DragState.DRAGGING) {
             this.gridHelper.visible = true;
-            // this.axesHelper.visible = true;
+            this.axesHelper.visible = true;
         }
         else {
             this.gridHelper.visible = false;
@@ -202,7 +198,7 @@ export class MainAnimation extends ThreeAnimation {
         }
         
         if (this.dragger.state !== DragState.IDLE && this.mouseOnScreen) {
-            this.selectedLight.position.copy(this.dragger.mesh.position);
+            this.selectedLight.position.copy(this.dragger.object.position);
             this.selectedLight.intensity = 1.0;
             this.selectedLight.color = this.dragger.valid ? get(highlightColor) : get(wrongColor);
         }
@@ -284,13 +280,12 @@ export class MainAnimation extends ThreeAnimation {
         this.axesHelper = new AxesHelper( 5 );
         this.scene.add( this.axesHelper );
 
-        // const model = await loadGLTF('./models/model7.gltf');
-        // model.castShadow = true;
-        // model.receiveShadow = true;
-        // this.scene.add(model);
-        // model.scale.setScalar(0.3);
+        const grass = await loadGLTF('./models/grass.glb');
+        grass.castShadow = true;
+        grass.receiveShadow = true;
+        this.scene.add(grass);
 
-
+        // @ts-ignore
         this.tilesRenderer = await Nomoko.loadTile(
             "pub.OTFjOWU3ZjQtYWYwNi00MWNmLWFjNDAtNmRkNjA5MWZkNTdl.YSLcB8UuL0",
             "https://assets.platform.nomoko.world/u/a6fb8866/result_root_ext_tileset.json",
@@ -307,7 +302,6 @@ export class MainAnimation extends ThreeAnimation {
         this.tilesRenderer.group.receiveShadow = true;
         this.scene.add(this.tilesRenderer.group);
     
-
         setTimeout(() => {
             this.loadedCallback();
         }, 10);

@@ -1,12 +1,43 @@
-import { AdditiveBlending, Mesh, MeshBasicMaterial, MeshPhongMaterial } from "three";
-import type { Color, Group, Material } from "three";
+import { Mesh, MeshBasicMaterial, MeshPhongMaterial, Group } from "three";
+import type { Color, Material, Object3D } from "three";
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import type THREE from 'three';
 import { highlightColor, wrongColor } from "../stores";
 import { get } from 'svelte/store';
 
-export function highlight(mesh : Mesh, valid : boolean) {
+export function highlightObject(object : Object3D, valid : boolean) {
+    if (object instanceof Mesh) {
+        highlightMesh(object, valid);
+    }
+    else if (object instanceof Group) {
+        highlightGroup(object, valid);
+    }
+}
+
+export function unhighlightObject(object : Object3D) {
+    if (object instanceof Mesh) {
+        unhighlightMesh(object);
+    }
+    else if (object instanceof Group) {
+        unhighlightGroup(object);
+    }
+}
+
+export function highlightGroup(group : Group, valid : boolean) {
+    group.children.forEach((child) => {
+        highlightObject(child, valid);
+    });
+}
+
+export function unhighlightGroup(group : Group) {
+    group.children.forEach((child) => {
+        unhighlightObject(child as Mesh);
+    });
+}
+
+export function highlightMesh(mesh : Mesh, valid : boolean) {
+
     let previousMaterial = undefined;
     if (mesh.material instanceof Array) {
         previousMaterial = mesh.material[0].clone();
@@ -27,10 +58,9 @@ export function highlight(mesh : Mesh, valid : boolean) {
         return;
     
     mesh.userData['previousMaterial'] = previousMaterial;
-
 }
 
-export function unhighlight(mesh : Mesh) {
+export function unhighlightMesh(mesh : Mesh) {
         
     if (!mesh.userData['previousMaterial'])
         return;
@@ -39,7 +69,19 @@ export function unhighlight(mesh : Mesh) {
     setMeshMaterial(mesh, mesh.userData['previousMaterial']);
 }
 
-export function deepClone(mesh : Mesh) : Mesh{
+export function deepCloneObject(object : Object3D) : Object3D {
+    if (object instanceof Mesh) {
+        return deepCloneMesh(object);
+    }
+    else if (object instanceof Group) {
+        return deepCloneGroup(object);
+    }
+    else {
+        return object.clone();
+    }
+}
+
+export function deepCloneMesh(mesh : Mesh) : Mesh {
     if (mesh.material instanceof Array) {
         const clone =  new Mesh(mesh.geometry.clone(), mesh.material[0].clone());
         clone.userData['previousMaterial'] = mesh.userData['previousMaterial'];
@@ -50,6 +92,19 @@ export function deepClone(mesh : Mesh) : Mesh{
         clone.userData['previousMaterial'] = mesh.userData['previousMaterial'];
         return clone;
     }
+}
+
+export function deepCloneGroup(group : Group) : Group {
+    // iterate over elements of the group
+    const clone = new Group();
+    clone.position.copy(group.position);
+    clone.rotation.copy(group.rotation);
+    clone.scale.copy(group.scale);
+
+    group.children.forEach((child) => {
+        clone.add(deepCloneObject(child));
+    });
+    return clone;
 }
 
 export function setMeshMaterial(mesh : Mesh, material : Material) {

@@ -1,59 +1,87 @@
 <script lang="ts">
   import { watchResize } from "svelte-watch-resize";
-  import { Mesh, BoxGeometry, MeshPhongMaterial, SphereGeometry, Vector3, Vector2 } from "three";
+  import {
+    Vector3, 
+    Vector2 } from "three";
 
   // local imports
   import { dragID, assets } from '../stores';
+  import { loadGLTF } from '../ts/helpers';
   import type { Area } from "../ts/assetInstance";
+  import { onMount } from "svelte";
 
   const nItems = 20;
-
-  for (let i = 0; i < nItems; i++) {
-    let geometry : BoxGeometry | SphereGeometry = new BoxGeometry( 0.5, 0.5, 0.5 );
-            
-    if (Math.random() > 0.5)
-      geometry = new SphereGeometry(0.5, 5, 5);
-
-    const material = new MeshPhongMaterial( { color: 0xffffff } );
-    const mesh = new Mesh( geometry, material );
-
-    mesh.rotateX(Math.PI / 4);
-
-    const floor1 : Area = {
+  
+  const floor1 : Area = {
       name : 'floor',
       normal : new Vector3(0, 1, 0),
       boundingBox : {
         min : new Vector2(-5, 0),
         max : new Vector2(5, 5)
       },
-    }
+  }
 
-    const floor2 : Area = {
-      name : 'floor2',
-      normal : new Vector3(0, 1, 0),
-      boundingBox : {
-        min : new Vector2(-5, -5),
-        max : new Vector2(0, 0)
-      },
-    }
+  const floor2 : Area = {
+    name : 'floor2',
+    normal : new Vector3(0, 1, 0),
+    boundingBox : {
+      min : new Vector2(-5, -5),
+      max : new Vector2(0, 0)
+    },
+  }
 
-    
+
+  onMount(async () => {
+    const erne = await loadGLTF('./models/erne.gltf');
+    erne.castShadow = true;
+    erne.receiveShadow = true;
+    erne.scale.setScalar(0.02);
+    erne.rotateX(Math.PI / 4);
 
     assets.update( items => {
       items.push(
         {
-          name : 'CUBE',
-          mesh : mesh,
+          name : "Erne",
+          group : erne,
           areas : [floor1, floor2],
           focused : false,
           visible : true,
           viewerPosition : new Vector2(0, 0),
-          id : i
+          id : nItems
         }
       )
       return items;
     });
-  };
+  });
+
+  // for (let i = 0; i < nItems; i++) {
+  //   let geometry : BoxGeometry | SphereGeometry = new BoxGeometry( 0.5, 0.5, 0.5 );
+            
+  //   if (Math.random() > 0.5)
+  //     geometry = new SphereGeometry(0.5, 5, 5);
+
+  //   const material = new MeshPhongMaterial( { color: 0xffffff } );
+  //   const mesh = new Mesh( geometry, material );
+  //   const meshGroup = new Group();
+  //   meshGroup.add(mesh);
+
+  //   mesh.rotateX(Math.PI / 4);
+
+  //   assets.update( items => {
+  //     items.push(
+  //       {
+  //         name : 'CUBE',
+  //         group : meshGroup,
+  //         areas : [floor1, floor2],
+  //         focused : false,
+  //         visible : true,
+  //         viewerPosition : new Vector2(0, 0),
+  //         id : i
+  //       }
+  //     )
+  //     return items;
+  //   });
+  // };
 
   const update = () => {
     for (let i = 0; i < nItems; i++) {

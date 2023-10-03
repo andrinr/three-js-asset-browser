@@ -1,17 +1,17 @@
 // Three.js
 import { 
-    Mesh,
-    HemisphereLight,} from 'three';
+    HemisphereLight,
+    Object3D,} from 'three';
 
 // Local imports
 import { ThreeAnimation } from "./animation";
 import { dragID, assets } from '../stores';
-import { deepClone } from './helpers';
+import { deepCloneObject } from './helpers';
 import { get } from 'svelte/store';
 
 export class DragAnimation extends ThreeAnimation {
 
-    private mesh : Mesh;
+    private object : Object3D;
 
     public constructor() {
         super(true, false, false);
@@ -19,16 +19,16 @@ export class DragAnimation extends ThreeAnimation {
 
     public init(): void {
         dragID.subscribe((id) => {
-            if (id !== -1 && get(assets)[id].mesh !== this.mesh ) {
+            if (id !== -1 && get(assets)[id].group !== this.object ) {
                 console.log(id);
-                this.scene.remove(this.mesh);
-                this.mesh = deepClone(get(assets)[id].mesh);
-                this.mesh.rotateX(Math.PI / 4);
-                this.scene.add(this.mesh);
+                this.scene.remove(this.object);
+                this.object = deepCloneObject(get(assets)[id].group);
+                this.object.rotateX(Math.PI / 4);
+                this.scene.add(this.object);
             }
             else {
-                this.scene.remove(this.mesh);
-                this.mesh = undefined;
+                this.scene.remove(this.object);
+                this.object = undefined;
             }
         });
 
@@ -39,10 +39,10 @@ export class DragAnimation extends ThreeAnimation {
     }
 
     public update(delta: number): void {
-        if (!this.mesh)
+        if (!this.object)
             return;
 
-        this.mesh.rotation.y += 0.01;
+        this.object.rotation.y += 0.01;
     }
 
 	private addLights() : void {

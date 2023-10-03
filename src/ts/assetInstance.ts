@@ -1,4 +1,4 @@
-import type { Mesh, Vector3, Vector2 } from 'three';
+import type { Mesh, Vector3, Vector2, Group, Object3D } from 'three';
 
 export interface Area {
     name : string;
@@ -11,7 +11,7 @@ export interface Area {
     
 export interface AssetInstance {
     name : string;
-    mesh : Mesh;
+    group : Object3D;
     areas : Area[];
     visible : boolean;
     focused : boolean;

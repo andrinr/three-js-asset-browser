@@ -4,22 +4,22 @@ import {
     Raycaster,
     Vector2,
     Mesh,
-    Color,
     HemisphereLight,
-    MeshPhongMaterial} from 'three';
+    MeshPhongMaterial,
+    Object3D} from 'three';
 
 // Local imports
 import { ThreeAnimation } from "./animation";
 import type {AssetInstance} from './assetInstance';
 import { assets } from '../stores';
-import { highlight, setMeshColor, unhighlight } from './helpers';
+import { highlightObject, unhighlightObject } from './helpers';
 
 export class AssetsAnimation extends ThreeAnimation {
 
     private loadedCallback : () => void;
     private floorPlane : Mesh;
 
-    private assetMap : Map<number, Mesh>;
+    private assetMap : Map<number, Object3D>;
 
     private hemiLight : HemisphereLight;
 
@@ -46,7 +46,7 @@ export class AssetsAnimation extends ThreeAnimation {
         this.addLights();
         this.addModels(); 
 
-        this.assetMap = new Map<number, Mesh>();
+        this.assetMap = new Map<number, Object3D>();
         assets.subscribe(this.updateAssets);
 
     }
@@ -69,8 +69,8 @@ export class AssetsAnimation extends ThreeAnimation {
             const id = assets[i].id;
 
             if (!this.assetMap.has(id)) {
-                this.scene.add(assets[i].mesh);
-                this.assetMap.set(id, assets[i].mesh);
+                this.scene.add(assets[i].group);
+                this.assetMap.set(id, assets[i].group);
             }
 
             let pos = new Vector2(assets[i].viewerPosition.x, assets[i].viewerPosition.y);
@@ -80,9 +80,9 @@ export class AssetsAnimation extends ThreeAnimation {
             const intersects = this.raycaster.intersectObject(this.floorPlane);
 
             if (assets[i].focused) 
-                highlight(this.assetMap.get(id), true);
+                highlightObject(this.assetMap.get(id), true);
             else
-                unhighlight(this.assetMap.get(id));
+                unhighlightObject(this.assetMap.get(id));
         
 
             if (intersects.length > 0) {  
