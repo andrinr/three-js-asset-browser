@@ -6,7 +6,7 @@ export const dragID : Writable<number> = writable(-1);
 
 export const assets : Writable<AssetInstance[]> = writable([]);
 
-export const highlightColor : Readable<Color> = readable(new Color(0x0000ff));
+export const highlightColor : Readable<Color> = readable(new Color(0x33e678));
 
 export const wrongColor : Readable<Color> = readable(new Color(0xDB5516));
 export const areaColor : Readable<Color> = readable(new Color(0x33e678));
