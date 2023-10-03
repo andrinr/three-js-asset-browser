@@ -276,11 +276,6 @@ export class MainAnimation extends ThreeAnimation {
         this.axesHelper = new AxesHelper( 5 );
         // this.scene.add( this.axesHelper );
 
-        const grass = await loadGLTF('./models/grass.glb');
-        grass.castShadow = true;
-        grass.receiveShadow = true;
-        this.scene.add(grass);
-
         // @ts-ignore
         this.tilesRenderer = await Nomoko.loadTile(
             "pub.OTFjOWU3ZjQtYWYwNi00MWNmLWFjNDAtNmRkNjA5MWZkNTdl.YSLcB8UuL0",

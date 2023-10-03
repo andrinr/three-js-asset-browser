@@ -107,21 +107,12 @@ export class Dragger {
         this.raycaster.setFromCamera(mousePosition, this.camera);
         const intersections = this.raycaster.intersectObject(this.intersectionPlane);
         
-        const size = new Vector3();
-        new Box3().setFromObject(object).getSize(size);
-        const height = size.y;
-
-        console.log(height);
-
         if (intersections.length > 0) {
             const intersection = intersections[0];
 
             const position = intersection.point;
-            console.log(position);
-
-            const y = position.y; //+ height / 2;
-
-            object.position.set(position.x, y, position.z);
+            
+            object.position.set(position.x, position.y, position.z);
             object.position.x = Math.round(object.position.x + 0.5) - 0.5;
             object.position.z = Math.round(object.position.z + 0.5) - 0.5;
         }
