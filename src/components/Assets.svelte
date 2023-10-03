@@ -16,18 +16,9 @@
       name : 'floor',
       normal : new Vector3(0, 1, 0),
       boundingBox : {
-        min : new Vector2(-80, -50),
-        max : new Vector2(20, 50)
+        min : new Vector2(-90, -10),
+        max : new Vector2(20, 60)
       },
-  }
-
-  const floor2 : Area = {
-    name : 'floor2',
-    normal : new Vector3(0, 1, 0),
-    boundingBox : {
-      min : new Vector2(-80, -50),
-      max : new Vector2(-100, 0)
-    },
   }
 
   const floor3 : Area = {
@@ -42,7 +33,6 @@
 
   onMount(async () => {
     const erne = await loadGLTF('./models/erne.gltf');
-    // combine all objects in group into a single mesh
     erne.userData["assetID"] = 0;
     
     erne.castShadow = true;
@@ -54,11 +44,33 @@
         {
           name : "Erne",
           object : erne,
-          areas : [floor1, floor2, floor3],
+          areas : [floor1, floor3],
           focused : false,
           visible : true,
           viewerPosition : new Vector2(0, 0),
           id : 0,
+        }
+      )
+      return items;
+    });
+
+    const solar = await loadGLTF('./models/solar3.gltf');
+    solar.userData["assetID"] = 1;
+
+    solar.castShadow = true;
+    solar.receiveShadow = true;
+    solar.scale.setScalar(20.0);
+    
+    assets.update( items => {
+      items.push(
+        {
+          name : "Solar",
+          object : solar,
+          areas : [floor1, floor2, floor3],
+          focused : false,
+          visible : true,
+          viewerPosition : new Vector2(0, 0),
+          id : 1,
         }
       )
       return items;

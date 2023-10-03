@@ -121,8 +121,9 @@ export class Dragger {
         let intersect = false;
         for (let area of this.areas) {
             const areaBoundingBox = new Box3().setFromObject(area);
-
-            if (boundingBox.intersectsBox(areaBoundingBox)) {
+            
+            
+            if (areaBoundingBox.containsBox(boundingBox)) {
                 intersect = true;
                 break;
             }

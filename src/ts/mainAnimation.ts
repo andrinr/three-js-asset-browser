@@ -115,7 +115,7 @@ export class MainAnimation extends ThreeAnimation {
                     outline.lineTo(area.boundingBox.min.x, area.boundingBox.min.y);
 
                     const extrudeSettings = {
-                        depth: -10,
+                        depth: -20,
                         bevelEnabled: false
                     };
 
@@ -130,7 +130,7 @@ export class MainAnimation extends ThreeAnimation {
                     const lookAt = new Matrix4().lookAt(new Vector3(0, 0, 0), area.normal, new Vector3(0, 1, 0));
 
                     meshFront.applyMatrix4(lookAt);
-                    meshFront.position.set(0, -2, 0);
+                    meshFront.position.set(0, -10, 0);
 
                     // meshBack.applyMatrix4(lookAt);
                     // meshBack.position.set(0, -2, 0);
@@ -241,12 +241,6 @@ export class MainAnimation extends ThreeAnimation {
 		light.shadow.camera.far = 100 * this.scale;
 		light.shadow.bias = -0.00001;
         light.shadow.radius = 0.7;
-
-        // const helper = new DirectionalLightHelper( light, 5 );
-        // this.scene.add( helper );
-
-		//const ambientLight = new AmbientLight( "0xffffff");
-        //ambientLight.intensity = 0.1;
         
         const hemiLight = new HemisphereLight( 0xffffff, 0x8d8d8d, 0.3 );
         hemiLight.position.set(0, 20, 0);
@@ -254,8 +248,6 @@ export class MainAnimation extends ThreeAnimation {
         this.selectedLight = new PointLight(get(highlightColor), 0, 3, 2);
         this.scene.add(this.selectedLight);
         this.scene.add(light);
-        this.scene.add(hemiLight);
-		//this.scene.add(ambientLight);
 	}
 
 	private async addModels() {
