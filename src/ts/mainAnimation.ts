@@ -100,6 +100,10 @@ export class MainAnimation extends ThreeAnimation {
             if (id !== -1) {
                 const asset = get(assets)[id];
 
+                console.log(asset);
+
+                asset.object.userData['assetID'] = id;	
+
                 const dragAreas = [];
 
                 for (let area of asset.areas) {
@@ -156,7 +160,7 @@ export class MainAnimation extends ThreeAnimation {
                     this.dragger.addAsset(this.dragger.object);
                     notification.set(
                         {
-                            message : "New asset placed",
+                            message : "Asset placed",
                             type : NotificationType.SUCCESS,
                         }
                     )
@@ -165,7 +169,7 @@ export class MainAnimation extends ThreeAnimation {
                     this.scene.remove(this.dragger.object);
                     notification.set(
                         {
-                            message : "Asset not placed in a valid area",
+                            message : "Invalid area",
                             type : NotificationType.ERROR,
                         }
                     )
@@ -275,10 +279,10 @@ export class MainAnimation extends ThreeAnimation {
         const divisions = 100;
 
         this.gridHelper = new GridHelper( size, divisions );
-        this.scene.add( this.gridHelper );
+        // this.scene.add( this.gridHelper );
 
         this.axesHelper = new AxesHelper( 5 );
-        this.scene.add( this.axesHelper );
+        // this.scene.add( this.axesHelper );
 
         const grass = await loadGLTF('./models/grass.glb');
         grass.castShadow = true;

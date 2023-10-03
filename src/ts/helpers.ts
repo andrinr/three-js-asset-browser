@@ -84,12 +84,12 @@ export function deepCloneObject(object : Object3D) : Object3D {
 export function deepCloneMesh(mesh : Mesh) : Mesh {
     if (mesh.material instanceof Array) {
         const clone =  new Mesh(mesh.geometry.clone(), mesh.material[0].clone());
-        clone.userData['previousMaterial'] = mesh.userData['previousMaterial'];
+        clone.userData = mesh.userData;
         return clone;
     }
     else {
         const clone = new Mesh(mesh.geometry.clone(), mesh.material.clone());
-        clone.userData['previousMaterial'] = mesh.userData['previousMaterial'];
+        clone.userData = mesh.userData;
         return clone;
     }
 }
@@ -100,6 +100,9 @@ export function deepCloneGroup(group : Group) : Group {
     clone.position.copy(group.position);
     clone.rotation.copy(group.rotation);
     clone.scale.copy(group.scale);
+
+    // clone userData
+    clone.userData = group.userData;
 
     group.children.forEach((child) => {
         clone.add(deepCloneObject(child));
@@ -160,7 +163,7 @@ export function setMaterialColor(material : Material, color : Color) {
     }
 }
 
-export async function loadGLTF(modelPath) : Promise<Group> {
+export async function loadGLTF(modelPath) : Promise<Object3D> {
     const dracoLoader = new DRACOLoader();
     dracoLoader.setDecoderConfig({ type: 'js' });
     dracoLoader.setDecoderPath( 'models/draco/' );

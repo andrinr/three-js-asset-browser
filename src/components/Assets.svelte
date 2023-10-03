@@ -42,6 +42,9 @@
 
   onMount(async () => {
     const erne = await loadGLTF('./models/erne.gltf');
+    // combine all objects in group into a single mesh
+    erne.userData["assetID"] = 0;
+    
     erne.castShadow = true;
     erne.receiveShadow = true;
     erne.scale.setScalar(1.0);
@@ -55,7 +58,7 @@
           focused : false,
           visible : true,
           viewerPosition : new Vector2(0, 0),
-          id : nItems,
+          id : 0,
         }
       )
       return items;
