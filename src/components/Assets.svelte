@@ -32,7 +32,55 @@
 
 
   onMount(async () => {
-    const erne = await loadGLTF('./models/erne.gltf');
+    const solar = await loadGLTF('./models/solar6.gltf');
+    solar.userData["assetID"] = 1;
+
+    solar.castShadow = true;
+    solar.receiveShadow = true;
+    solar.scale.setScalar(20.0);
+    solar.position.set(0, -100, 0);
+    //solar.rotateY(-Math.PI);
+    
+    assets.update( items => {
+      items.push(
+        {
+          name : "Solar",
+          object : solar,
+          areas : [floor1, floor3],
+          focused : false,
+          visible : true,
+          viewerPosition : new Vector2(0, 0),
+          id : 1,
+          browserScale : 4.0
+        }
+      )
+      return items;
+    });
+
+    const tree = await loadGLTF('./models/tree3.gltf');
+    tree.userData["assetID"] = 2;
+
+    tree.castShadow = true;
+    tree.receiveShadow = true;
+    tree.scale.setScalar(600.0);
+    
+    assets.update( items => {
+      items.push(
+        {
+          name : "Tree",
+          object : tree,
+          areas : [floor1, floor3],
+          focused : false,
+          visible : true,
+          viewerPosition : new Vector2(0, 0),
+          id : 2,
+          browserScale : 40.0
+        }
+      )
+      return items;
+    });
+
+    const erne = await loadGLTF('./models/erne3.gltf');
     erne.userData["assetID"] = 0;
     
     erne.castShadow = true;
@@ -49,28 +97,7 @@
           visible : true,
           viewerPosition : new Vector2(0, 0),
           id : 0,
-        }
-      )
-      return items;
-    });
-
-    const solar = await loadGLTF('./models/solar3.gltf');
-    solar.userData["assetID"] = 1;
-
-    solar.castShadow = true;
-    solar.receiveShadow = true;
-    solar.scale.setScalar(20.0);
-    
-    assets.update( items => {
-      items.push(
-        {
-          name : "Solar",
-          object : solar,
-          areas : [floor1, floor2, floor3],
-          focused : false,
-          visible : true,
-          viewerPosition : new Vector2(0, 0),
-          id : 1,
+          browserScale : 0.02
         }
       )
       return items;
@@ -113,7 +140,7 @@
         const rect = item.getBoundingClientRect();
 
         const x = rect.left + rect.width / 2;
-		    const y = rect.top + rect.height / 2 + 10;
+		    const y = rect.top + rect.height / 2 + 30;
 
         assets.update( assetsArray => {
           assetsArray[i].viewerPosition.x = x;
