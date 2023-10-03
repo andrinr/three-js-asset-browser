@@ -73,7 +73,6 @@ export class Dragger {
             this.unselect(this.object);
             this.state = DragState.IDLE;
         }
-        
     }
 
     public startDrag(object : Object3D, id : number, areas : Mesh[]) {
@@ -83,7 +82,7 @@ export class Dragger {
         this.object.receiveShadow = true;
         this.state = DragState.DRAGGING;
 
-        console.log("Start drag");
+        // console.log("Start drag");
 
         this.select(this.object);
 
@@ -140,13 +139,16 @@ export class Dragger {
 
     private getIntersectedMesh(mousePosition : Vector2) : Object3D | undefined {
         this.raycaster.setFromCamera(mousePosition, this.camera);
-        const intersects = this.raycaster.intersectObjects(this.selectables);
+        const intersects = this.raycaster.intersectObjects(this.selectables, false);
+
+        // console.log(intersects);
+        // console.log(this.selectables);
 
         if (intersects.length > 0) {
             const intersect = intersects[0];
-            const mesh = intersect.object as Object3D;
+            const object = intersect.object as Object3D;
 
-            return mesh;
+            return object;
         }
 
         return undefined;

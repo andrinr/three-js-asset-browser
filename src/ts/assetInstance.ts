@@ -11,7 +11,7 @@ export interface Area {
     
 export interface AssetInstance {
     name : string;
-    group : Object3D;
+    object : Object3D;
     areas : Area[];
     visible : boolean;
     focused : boolean;

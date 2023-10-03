@@ -19,6 +19,7 @@ export abstract class ThreeAnimation {
 
     private lastTime : number = 0;
     private startTime : number = 0;
+    private needsUpdate : boolean = false;
     public secondsPassed : number = 0;
 
     public renderer : WebGLRenderer;
@@ -105,7 +106,7 @@ export abstract class ThreeAnimation {
         this.scene = new Scene();
             
         if (!this.orthographicMode)
-            this.camera = new PerspectiveCamera( 45, this.wrapper.clientWidth / this.wrapper.clientHeight, 1, 100 );
+            this.camera = new PerspectiveCamera( 75, this.wrapper.clientWidth / this.wrapper.clientHeight, 1, 100 );
         else 
             this.camera = new OrthographicCamera( 
                 this.wrapper.clientWidth / - 2, 
@@ -132,12 +133,11 @@ export abstract class ThreeAnimation {
 		this.lastTime = Date.now();
         this.secondsPassed = (Date.now() - this.startTime) / 1000;
 
-
+        this.needsUpdate = false;
         this.update(dt);
-
-        this.click = false;
-
         this.renderer.render( this.scene, this.camera );
+        
+        this.click = false;
     }
 
     public onMouseMove(event : MouseEvent) : void {
@@ -152,25 +152,35 @@ export abstract class ThreeAnimation {
         else {
             this.mouseOnScreen = true;
         }
+
+        this.needsUpdate = true;
     }
 
     public onMouseDown(event : MouseEvent) : void {
         this.mouseDown = true;
         this.click = true;
+
+        this.needsUpdate = true;
     };
 
     public onMouseUp(event : MouseEvent) : void {
         this.mouseDown = false;
+
+        this.needsUpdate = true;
     };
 
     public onScroll(event : WheelEvent) : void {};
 
     public onMouseLeave(event: MouseEvent): void {
         this.mouseOnScreen = false;
+
+        this.needsUpdate = true;
     }
 
     private onMouseOver(event: MouseEvent): void {
         this.mouseOnScreen = true;
+
+        this.needsUpdate = true;
     }
 
     public resize(element : HTMLElement) {
@@ -187,6 +197,8 @@ export abstract class ThreeAnimation {
         this.camera.updateProjectionMatrix();
         this.renderer.setSize( element.offsetWidth, element.offsetHeight );
         this.portraitMode = element.offsetHeight > element.offsetWidth;
+
+        this.needsUpdate = true;
     }
 
     public documentToCanvasPosition(vec : Vector2) : Vector2 {

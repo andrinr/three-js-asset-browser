@@ -19,10 +19,10 @@ export class DragAnimation extends ThreeAnimation {
 
     public init(): void {
         dragID.subscribe((id) => {
-            if (id !== -1 && get(assets)[id].group !== this.object ) {
+            if (id !== -1 && get(assets)[id].object !== this.object ) {
                 console.log(id);
                 this.scene.remove(this.object);
-                this.object = deepCloneObject(get(assets)[id].group);
+                this.object = deepCloneObject(get(assets)[id].object);
                 this.object.rotateX(Math.PI / 4);
                 this.scene.add(this.object);
             }

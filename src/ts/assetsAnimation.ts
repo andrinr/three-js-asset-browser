@@ -3,7 +3,9 @@ import {
     PlaneGeometry, 
     Raycaster,
     Vector2,
+    Vector3,
     Mesh,
+    Box3,
     HemisphereLight,
     MeshPhongMaterial,
     Object3D} from 'three';
@@ -12,7 +14,7 @@ import {
 import { ThreeAnimation } from "./animation";
 import type {AssetInstance} from './assetInstance';
 import { assets } from '../stores';
-import { highlightObject, unhighlightObject } from './helpers';
+import { deepCloneObject, highlightObject, unhighlightObject } from './helpers';
 
 export class AssetsAnimation extends ThreeAnimation {
 
@@ -69,8 +71,20 @@ export class AssetsAnimation extends ThreeAnimation {
             const id = assets[i].id;
 
             if (!this.assetMap.has(id)) {
-                this.scene.add(assets[i].group);
-                this.assetMap.set(id, assets[i].group);
+                const object = deepCloneObject(assets[i].object);
+
+                const boundingBox = new Box3().setFromObject(object)
+                let size : Vector3 = new Vector3();
+                boundingBox.getSize(size);
+
+                const scale = 1.0 / Math.max(size.x, size.y, size.z);
+                console.log(Math.max(size.x, size.y, size.z));
+                console.log(scale);
+                object.scale.set(scale, scale, scale);
+                object.rotateX(Math.PI / 4);
+
+                this.scene.add(object);
+                this.assetMap.set(id, object);
             }
 
             let pos = new Vector2(assets[i].viewerPosition.x, assets[i].viewerPosition.y);

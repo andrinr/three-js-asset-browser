@@ -61,7 +61,7 @@ export class MainAnimation extends ThreeAnimation {
         this.controls.enableZoom = true;
         this.controls.enableRotate = true;
 
-        this.camera.position.set(0, 15, 10);
+        this.camera.position.set(3, 15, 10);
         this.camera.lookAt(new Vector3(0,0,0));
         this.controls.maxDistance = 60 * this.scale ;
         this.controls.minDistance = 3 * this.scale ;
@@ -140,10 +140,10 @@ export class MainAnimation extends ThreeAnimation {
                     dragAreas.push(meshBack);
                 }
 
-                this.dragger.startDrag(asset.group, id, dragAreas);
+                this.dragger.startDrag(asset.object, id, dragAreas);
                 this.dragger.dragMesh(this.dragger.object, this.mousePosition, this.mouseOnScreen);
 
-                if (this.scene.getObjectById(asset.group.id) === undefined)
+                if (this.scene.getObjectById(asset.object.id) === undefined)
                     this.scene.add(this.dragger.object);
 
                 this.controls.enabled = false;

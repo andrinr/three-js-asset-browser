@@ -35,19 +35,18 @@
     const erne = await loadGLTF('./models/erne.gltf');
     erne.castShadow = true;
     erne.receiveShadow = true;
-    erne.scale.setScalar(0.02);
-    erne.rotateX(Math.PI / 4);
+    erne.scale.setScalar(0.14);
 
     assets.update( items => {
       items.push(
         {
           name : "Erne",
-          group : erne,
+          object : erne,
           areas : [floor1, floor2],
           focused : false,
           visible : true,
           viewerPosition : new Vector2(0, 0),
-          id : nItems
+          id : nItems,
         }
       )
       return items;
