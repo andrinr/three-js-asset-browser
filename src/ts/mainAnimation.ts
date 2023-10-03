@@ -264,7 +264,7 @@ export class MainAnimation extends ThreeAnimation {
         this.intersectionPlane = new Mesh(new PlaneGeometry(2000, 2000, 8, 8), new MeshPhongMaterial({color: 0x999999}));
         this.intersectionPlane.position.set(0, -3, 0);
         this.intersectionPlane.rotateX(-Math.PI / 2);
-        this.intersectionPlane.visible = true;
+        this.intersectionPlane.visible = false;
         this.scene.add(this.intersectionPlane);
 
         const size = 100;
