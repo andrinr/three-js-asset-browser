@@ -106,7 +106,7 @@ export abstract class ThreeAnimation {
         this.scene = new Scene();
             
         if (!this.orthographicMode)
-            this.camera = new PerspectiveCamera( 75, this.wrapper.clientWidth / this.wrapper.clientHeight, 1, 100 );
+            this.camera = new PerspectiveCamera( 75, this.wrapper.clientWidth / this.wrapper.clientHeight, 1, 10000 );
         else 
             this.camera = new OrthographicCamera( 
                 this.wrapper.clientWidth / - 2, 

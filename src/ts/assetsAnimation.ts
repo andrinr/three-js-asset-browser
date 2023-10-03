@@ -77,11 +77,10 @@ export class AssetsAnimation extends ThreeAnimation {
                 let size : Vector3 = new Vector3();
                 boundingBox.getSize(size);
 
-                const scale = 1.0 / Math.max(size.x, size.y, size.z);
-                console.log(Math.max(size.x, size.y, size.z));
-                console.log(scale);
+                const scale = 2.0 / Math.max(size.x, size.y, size.z);
+    
                 object.scale.set(scale, scale, scale);
-                object.rotateX(Math.PI / 4);
+                object.rotateX(Math.PI / 8);
 
                 this.scene.add(object);
                 this.assetMap.set(id, object);

@@ -16,8 +16,8 @@
       name : 'floor',
       normal : new Vector3(0, 1, 0),
       boundingBox : {
-        min : new Vector2(-5, 0),
-        max : new Vector2(5, 5)
+        min : new Vector2(-80, -50),
+        max : new Vector2(20, 50)
       },
   }
 
@@ -25,8 +25,17 @@
     name : 'floor2',
     normal : new Vector3(0, 1, 0),
     boundingBox : {
-      min : new Vector2(-5, -5),
-      max : new Vector2(0, 0)
+      min : new Vector2(-80, -50),
+      max : new Vector2(-100, 0)
+    },
+  }
+
+  const floor3 : Area = {
+    name : 'floor2',
+    normal : new Vector3(0, 1, 0),
+    boundingBox : {
+      min : new Vector2(-120, -50),
+      max : new Vector2(40, -150)
     },
   }
 
@@ -35,14 +44,14 @@
     const erne = await loadGLTF('./models/erne.gltf');
     erne.castShadow = true;
     erne.receiveShadow = true;
-    erne.scale.setScalar(0.14);
+    erne.scale.setScalar(1.0);
 
     assets.update( items => {
       items.push(
         {
           name : "Erne",
           object : erne,
-          areas : [floor1, floor2],
+          areas : [floor1, floor2, floor3],
           focused : false,
           visible : true,
           viewerPosition : new Vector2(0, 0),

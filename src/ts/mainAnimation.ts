@@ -61,9 +61,9 @@ export class MainAnimation extends ThreeAnimation {
         this.controls.enableZoom = true;
         this.controls.enableRotate = true;
 
-        this.camera.position.set(3, 15, 10);
+        this.camera.position.set(3, 150, 100);
         this.camera.lookAt(new Vector3(0,0,0));
-        this.controls.maxDistance = 60 * this.scale ;
+        this.controls.maxDistance = 600 * this.scale ;
         this.controls.minDistance = 3 * this.scale ;
         this.controls.maxPolarAngle = Math.PI / 2 - Math.PI / 20;
         this.controls.minPolarAngle = Math.PI / 20;
@@ -86,15 +86,15 @@ export class MainAnimation extends ThreeAnimation {
             emissive: get(areaColor),
             transparent: true,
             emissiveIntensity: 0.5,
-            opacity: 0.3,
-            side: BackSide});
+            opacity: 0.6,
+            side: FrontSide});
 
         this.emissiveFront = new MeshStandardMaterial({
                 emissive: get(areaColor),
                 transparent: true,
                 emissiveIntensity: 0.5,
-                opacity: 0.3,
-                side: FrontSide});
+                opacity: 0.6,
+                side: BackSide});
 
         dragID.subscribe((id) => {
             if (id !== -1) {
@@ -111,16 +111,16 @@ export class MainAnimation extends ThreeAnimation {
                     outline.lineTo(area.boundingBox.min.x, area.boundingBox.min.y);
 
                     const extrudeSettings = {
-                        depth: -3,
+                        depth: -10,
                         bevelEnabled: false
                     };
 
                     const geometry = new ExtrudeGeometry(outline, extrudeSettings);
 
                     const meshFront = new Mesh(geometry, this.emissiveFront);
-                    const meshBack = new Mesh(geometry, this.emissiveBack);
+                    // const meshBack = new Mesh(geometry, this.emissiveBack);
 
-                    meshBack.renderOrder = 1000;
+                    // meshBack.renderOrder = 1000;
                     meshFront.renderOrder = 1000;
 
                     const lookAt = new Matrix4().lookAt(new Vector3(0, 0, 0), area.normal, new Vector3(0, 1, 0));
@@ -128,16 +128,16 @@ export class MainAnimation extends ThreeAnimation {
                     meshFront.applyMatrix4(lookAt);
                     meshFront.position.set(0, -2, 0);
 
-                    meshBack.applyMatrix4(lookAt);
-                    meshBack.position.set(0, -2, 0);
+                    // meshBack.applyMatrix4(lookAt);
+                    // meshBack.position.set(0, -2, 0);
 
                     this.scene.add(meshFront);
-                    this.scene.add(meshBack);
+                    // this.scene.add(meshBack);
 
-                    this.areas.push(meshBack);
+                    // this.areas.push(meshBack);
                     this.areas.push(meshFront);
 
-                    dragAreas.push(meshBack);
+                    dragAreas.push(meshFront);
                 }
 
                 this.dragger.startDrag(asset.object, id, dragAreas);
@@ -256,14 +256,14 @@ export class MainAnimation extends ThreeAnimation {
 
 	private async addModels() {
 
-        const planeY = 0;
-        const floor = new PlaneGeometry(2000, 2000, 8, 8);
-        const floorMesh = new Mesh(floor, new MeshPhongMaterial({color: 0xffffff}));
-        this.floorPlane = floorMesh;
-        floorMesh.position.set(0, planeY, 0);
-        floorMesh.rotateX(-Math.PI / 2);
-        floorMesh.receiveShadow = true;
-        this.scene.add(floorMesh);
+        // const planeY = 0;
+        // const floor = new PlaneGeometry(2000, 2000, 8, 8);
+        // const floorMesh = new Mesh(floor, new MeshPhongMaterial({color: 0xffffff}));
+        // this.floorPlane = floorMesh;
+        // floorMesh.position.set(0, planeY, 0);
+        // floorMesh.rotateX(-Math.PI / 2);
+        // floorMesh.receiveShadow = true;
+        // this.scene.add(floorMesh);
 
         this.intersectionPlane = new Mesh(new PlaneGeometry(2000, 2000, 8, 8), new MeshPhongMaterial({color: 0x999999}));
         this.intersectionPlane.position.set(0, 0.25, 0);
@@ -297,8 +297,8 @@ export class MainAnimation extends ThreeAnimation {
         console.log(this.tilesRenderer);
 
         this.tilesRenderer.group.rotation.x = -Math.PI / 2;
-        this.tilesRenderer.group.scale.setScalar(0.1);
-        this.tilesRenderer.group.position.set(0, -30, 0);
+        this.tilesRenderer.group.scale.setScalar(1);
+        this.tilesRenderer.group.position.set(0, -304, 0);
         this.tilesRenderer.group.receiveShadow = true;
         this.scene.add(this.tilesRenderer.group);
     
