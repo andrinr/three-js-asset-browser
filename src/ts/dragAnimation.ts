@@ -24,6 +24,9 @@ export class DragAnimation extends ThreeAnimation {
                 this.scene.remove(this.object);
                 this.object = deepCloneObject(get(assets)[id].object);
                 this.object.rotateX(Math.PI / 4);
+                const scale = get(assets)[id].previewScale;
+                this.object.scale.set(scale, scale, scale);
+                
                 this.scene.add(this.object);
             }
             else {

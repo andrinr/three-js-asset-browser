@@ -73,7 +73,7 @@ export class AssetsAnimation extends ThreeAnimation {
             if (!this.assetMap.has(id)) {
                 const object = deepCloneObject(assets[i].object);
 
-                object.scale.setScalar(assets[i].browserScale);
+                object.scale.setScalar(assets[i].previewScale);
                 object.rotateX(Math.PI / 8);
 
                 this.scene.add(object);

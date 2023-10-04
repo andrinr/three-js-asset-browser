@@ -189,8 +189,8 @@
 
   #wrapper-drag {
     position: absolute;
-    width: 100px;
-    height: 100px;
+    width: 170px;
+    height: 170px;
     z-index: 10;
     display: none;
   }

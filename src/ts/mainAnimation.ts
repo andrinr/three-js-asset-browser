@@ -100,6 +100,8 @@ export class MainAnimation extends ThreeAnimation {
             if (id !== -1) {
                 const asset = get(assets)[id];
 
+                asset.object.scale.setScalar(asset.scale);
+
                 console.log(asset);
 
                 asset.object.userData['assetID'] = id;	

@@ -51,7 +51,8 @@
           visible : true,
           viewerPosition : new Vector2(0, 0),
           id : 1,
-          browserScale : 4.0
+          previewScale : 4.0,
+          scale : 20.0
         }
       )
       return items;
@@ -74,7 +75,8 @@
           visible : true,
           viewerPosition : new Vector2(0, 0),
           id : 2,
-          browserScale : 40.0
+          previewScale: 40,
+          scale : 600.0
         }
       )
       return items;
@@ -97,7 +99,8 @@
           visible : true,
           viewerPosition : new Vector2(0, 0),
           id : 0,
-          browserScale : 0.02
+          previewScale : 0.02,
+          scale : 1.0,
         }
       )
       return items;

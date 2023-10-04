@@ -17,5 +17,6 @@ export interface AssetInstance {
     focused : boolean;
     viewerPosition : Vector2;
     id : number;
-    browserScale : number;
+    previewScale : number;
+    scale : number;
 }
