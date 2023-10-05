@@ -1,16 +1,25 @@
 # Villages
 
-Naviage, explore and discover this virtual village.
+Drag & drop assets into streamed high quality map provided by NOMOKO.
 
-![Villages](villages.png)
-
-The project uses [Svelte](https://svelte.dev/), [Three.js](https://threejs.org/) and [Typescript](https://www.typescriptlang.org/). It features a small animation system, a simple state management system and a simple event system.
+![Preview]](image.png)
 
 
-## Get started
+Stack highlights:
 
-1. ``npm install``
-2. ``npm run dev``
+- Svelte
+- Typescript
+- Three.js
 
+## Development
 
+```bash
+npm install
+npm run dev
+```
 
+## Build
+
+```bash
+npm run build
+```
