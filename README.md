@@ -2,7 +2,7 @@
 
 Drag & drop assets into streamed high quality map provided by NOMOKO.
 
-![Preview]](image.png)
+![Preview](preview.png)
 
 
 Stack highlights:
