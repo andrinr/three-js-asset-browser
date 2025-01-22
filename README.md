@@ -1,15 +1,9 @@
-# Villages
+# Asset Browser
 
-Drag & drop assets into streamed high quality map provided by NOMOKO.
+Proof of concept for an asset browser in three.js with drag and drop functions. Note the asset is even rendered in 3D while being dragged across the screen.
 
 ![Preview](preview.png)
 
-
-Stack highlights:
-
-- Svelte
-- Typescript
-- Three.js
 
 ## Development
 
